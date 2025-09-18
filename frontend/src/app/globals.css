@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.bg-gradient {
+  background: linear-gradient(
+    306deg,
+    rgba(175, 224, 255, 1) 0%,
+    rgba(103, 93, 228, 1) 0%,
+    rgba(126, 152, 199, 1) 12%,
+    rgba(140, 192, 208, 1) 24%,
+    rgba(177, 235, 171, 1) 36%,
+    rgba(214, 255, 210, 1) 48%,
+    rgba(217, 255, 249, 1) 60%,
+    rgba(229, 255, 255, 1) 72%,
+    rgba(202, 234, 255, 1) 85%,
+    rgba(126, 152, 199, 1) 100%
+  );
+}
+
+.nav-gradient {
+  background: linear-gradient(
+    113deg,
+    #7fcff0 5.29%,
+    rgba(191, 246, 226) 47.71%,
+    #a6ea94 100%
+  );
+}
+
+  .my-container {
+    @apply w-full px-6 mx-auto xl:max-w-[1380px] 2xl:max-w-[1600px];
+  }

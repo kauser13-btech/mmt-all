@@ -25,7 +25,6 @@ services:
       - "FONT_END_BASE=${FONT_END_BASE:-http://localhost:3001/api/revalidate}"
       - "APP_DEBUG=${APP_DEBUG:-true}"
 
-
   nginx:
     image: nginx:1.25-alpine
     container_name: laravel_nginx
@@ -64,19 +63,18 @@ services:
       - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
     networks:
       - laravel
-  
+
   next:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      # multi-stage: dev vs prod
       target: ${NEXT_ENV:-dev}   # dev | prod
     container_name: nextjs
     ports:
       - "${NEXT_PORT:-3000}:3000"
     volumes:
-      - ./frontend:/app            # live source for HMR
-      - /app/node_modules      # prevent host overwrite
+      - ./frontend:/app
+      - /app/node_modules
     networks:
       - laravel
     environment:
@@ -84,21 +82,20 @@ services:
       - BASE_URL=${BASE_URL:-http://nginx/api/}
       - REVALIDATION_TOKEN=${REVALIDATION_TOKEN:-'N0Sug@r'}
     depends_on:
-      - nginx   # make sure Laravel is up
-    command: ["npm","run","dev"]   
+      - nginx
+    command: ["npm","run","dev"]
 
   adminfromt:
     build:
       context: ./admin
       dockerfile: Dockerfile
-      # multi-stage: dev vs prod
       target: ${NEXT_ENV:-dev}   # dev | prod
     container_name: admin
     ports:
-      - "${NEXT_PORT:-3001}:3001"
+      - "${NEXT_ADMIN_PORT:-3001}:3000"   # container always listens on 3000
     volumes:
-      - ./admin:/app            # live source for HMR
-      - /app/node_modules      # prevent host overwrite
+      - ./admin:/app
+      - /app/node_modules
     networks:
       - laravel
     environment:
@@ -106,8 +103,8 @@ services:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://nginx/api/}
       - REVALIDATION_TOKEN=${REVALIDATION_TOKEN:-'N0Sug@r'}
     depends_on:
-      - nginx   # make sure Laravel is up
-    command: ["npm","run","dev"]        
+      - nginx
+    command: ["npm","run","dev"]
 
 volumes:
   mariadb_data:

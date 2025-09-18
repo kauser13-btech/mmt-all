@@ -1,0 +1,15 @@
+<svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="497"
+            height="90"
+            viewBox="0 0 497 60"
+            fill="none"
+          >
+            <path
+              d="M1 28C1 28 121.152 1 232.542 1C343.933 1 496 22.4412 496 22.4412"
+              stroke="#00A6AC"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-dasharray="6 6"
+            />
+          </svg>

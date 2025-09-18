@@ -1,0 +1,11 @@
+<svg width="116" height="34" viewBox="0 0 116 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Frame 380">
+<circle id="Ellipse 91" cx="17" cy="17" r="16.5" stroke="#05A5AC"/>
+<path id="Vector" d="M25.56 9H9V12.6H25.56V9Z" stroke="#05A5AC" stroke-miterlimit="10" stroke-linecap="round"/>
+<path id="Vector_2" d="M10 12.6001V24.4801H25.12V12.6001H10ZM20.2607 16.5601H14.8593C14.3621 16.5601 13.9593 16.1573 13.9593 15.6601C13.9593 15.1629 14.3621 14.7601 14.8593 14.7601H20.2607C20.7579 14.7601 21.1607 15.1629 21.1607 15.6601C21.1607 16.1573 20.7579 16.5601 20.2607 16.5601Z" stroke="#05A5AC" stroke-miterlimit="10" stroke-linecap="round"/>
+<circle id="Ellipse 92" cx="66" cy="17" r="8.5" stroke="#05A5AC"/>
+<circle id="Ellipse 93" cx="107" cy="17" r="8.5" stroke="#05A5AC"/>
+<line id="Line 45" x1="34" y1="17.5" x2="58" y2="17.5" stroke="#05A5AC" stroke-dasharray="1 1"/>
+<line id="Line 46" x1="75" y1="17.5" x2="99" y2="17.5" stroke="#05A5AC" stroke-dasharray="1 1"/>
+</g>
+</svg>

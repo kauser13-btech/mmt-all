@@ -8,11 +8,10 @@ docker compose exec app composer install --optimize-autoloader --no-dev
 docker compose exec app php artisan key:generate
 docker compose exec app php artisan migrate --force
 
-docker cp docker/mariadb/initdb.d/campus.sql  laravel_mariadb:/tmp/ 
-docker exec -i laravel_mariadb mariadb -u laravel -psecret laravel -e "source /tmp/campus.sql"
+docker cp docker/mariadb/initdb.d/mmt_db.sql  laravel_mariadb:/tmp/ 
+docker exec -i laravel_mariadb mariadb -u laravel -psecret laravel -e "source /tmp/mmt_db.sql"
 
 docker logs laravel_mariadb
-
 
 docker compose exec app php artisan queue:failed-table
 

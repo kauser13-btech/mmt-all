@@ -1,3 +1,5 @@
+docker/mariadb/initdb.d/
+
 # Dependencies
 node_modules/
 npm-debug.log*
