@@ -6,7 +6,7 @@ export const ProductContainer = () => {
 
     {
       index: 1,
-      url: "/product/T-shirt/1",
+      url: "/product/1",
       image_url: "https://picsum.photos/id/123/800/600",
       title: "sneaker one",
       original_title: "Sneaker 1",
@@ -14,7 +14,7 @@ export const ProductContainer = () => {
     },
     {
       index: 2,
-      url: "/product/T-shirt/2",
+      url: "/product/2",
       image_url: "https://picsum.photos/id/124/800/600",
       title: "sneaker two",
       original_title: "Sneaker 2",
@@ -22,7 +22,7 @@ export const ProductContainer = () => {
     },
     {
       index: 3,
-      url: "/product/T-shirt/3",
+      url: "/product/3",
       image_url: "https://picsum.photos/id/125/800/600",
       title: "sneaker three",
       original_title: "Sneaker 3",
@@ -30,7 +30,7 @@ export const ProductContainer = () => {
     },
     {
       index: 4,
-      url: "/product/T-shirt/4",
+      url: "/product/4",
       image_url: "https://picsum.photos/id/126/800/600",
       title: "sneaker four",
       original_title: "Sneaker 4",
@@ -38,7 +38,7 @@ export const ProductContainer = () => {
     },
     {
       index: 5,
-      url: "/product/T-shirt/5",
+      url: "/product/5",
       image_url: "https://picsum.photos/id/127/800/600",
       title: "sneaker five",
       original_title: "Sneaker 5",
@@ -46,7 +46,7 @@ export const ProductContainer = () => {
     },
     {
       index: 6,
-      url: "/product/T-shirt/6",
+      url: "/product/6",
       image_url: "https://picsum.photos/id/128/800/600",
       title: "sneaker six",
       original_title: "Sneaker 6",
@@ -54,7 +54,7 @@ export const ProductContainer = () => {
     },
     {
       index: 7,
-      url: "/product/T-shirt/7",
+      url: "/product/7",
       image_url: "https://picsum.photos/id/129/800/600",
       title: "sneaker seven",
       original_title: "Sneaker 7",
@@ -62,7 +62,7 @@ export const ProductContainer = () => {
     },
     {
       index: 8,
-      url: "/product/T-shirt/8",
+      url: "/product/8",
       image_url: "https://picsum.photos/id/130/800/600",
       title: "sneaker eight",
       original_title: "Sneaker 8",
@@ -70,7 +70,7 @@ export const ProductContainer = () => {
     },
     {
       index: 9,
-      url: "/product/T-shirt/9",
+      url: "/product/9",
       image_url: "https://picsum.photos/id/131/800/600",
       title: "sneaker nine",
       original_title: "Sneaker 9",
@@ -78,7 +78,7 @@ export const ProductContainer = () => {
     },
     {
       index: 10,
-      url: "/product/T-shirt/10",
+      url: "/product/10",
       image_url: "https://picsum.photos/id/132/800/600",
       title: "sneaker ten",
       original_title: "Sneaker 10",
@@ -86,7 +86,7 @@ export const ProductContainer = () => {
     },
     {
       index: 11,
-      url: "/product/T-shirt/11",
+      url: "/product/11",
       image_url: "https://picsum.photos/id/133/800/600",
       title: "sneaker eleven",
       original_title: "Sneaker 11",
@@ -94,7 +94,7 @@ export const ProductContainer = () => {
     },
     {
       index: 12,
-      url: "/product/T-shirt/12",
+      url: "/product/12",
       image_url: "https://picsum.photos/id/134/800/600",
       title: "sneaker twelve",
       original_title: "Sneaker 12",
@@ -102,7 +102,7 @@ export const ProductContainer = () => {
     },
     {
       index: 13,
-      url: "/product/T-shirt/13",
+      url: "/product/13",
       image_url: "https://picsum.photos/id/135/800/600",
       title: "sneaker thirteen",
       original_title: "Sneaker 13",
@@ -110,7 +110,7 @@ export const ProductContainer = () => {
     },
     {
       index: 14,
-      url: "/product/T-shirt/14",
+      url: "/product/14",
       image_url: "https://picsum.photos/id/136/800/600",
       title: "sneaker fourteen",
       original_title: "Sneaker 14",
@@ -118,7 +118,7 @@ export const ProductContainer = () => {
     },
     {
       index: 15,
-      url: "/product/T-shirt/15",
+      url: "/product/15",
       image_url: "https://picsum.photos/id/137/800/600",
       title: "sneaker fifteen",
       original_title: "Sneaker 15",
@@ -126,7 +126,7 @@ export const ProductContainer = () => {
     },
     {
       index: 16,
-      url: "/product/T-shirt/16",
+      url: "/product/16",
       image_url: "https://picsum.photos/id/101/800/600",
       title: "sneaker sixteen",
       original_title: "Sneaker 16",
@@ -134,7 +134,7 @@ export const ProductContainer = () => {
     },
     {
       index: 17,
-      url: "/product/T-shirt/17",
+      url: "/product/17",
       image_url: "https://picsum.photos/id/139/800/600",
       title: "sneaker seventeen",
       original_title: "Sneaker 17",
@@ -142,7 +142,7 @@ export const ProductContainer = () => {
     },
     {
       index: 18,
-      url: "/product/T-shirt/18",
+      url: "/product/18",
       image_url: "https://picsum.photos/id/140/800/600",
       title: "sneaker eighteen",
       original_title: "Sneaker 18",
@@ -150,7 +150,7 @@ export const ProductContainer = () => {
     },
     {
       index: 19,
-      url: "/product/T-shirt/19",
+      url: "/product/19",
       image_url: "https://picsum.photos/id/141/800/600",
       title: "sneaker nineteen",
       original_title: "Sneaker 19",
@@ -158,7 +158,7 @@ export const ProductContainer = () => {
     },
     {
       index: 20,
-      url: "/product/T-shirt/20",
+      url: "/product/20",
       image_url: "https://picsum.photos/id/142/800/600",
       title: "sneaker twenty",
       original_title: "Sneaker 20",

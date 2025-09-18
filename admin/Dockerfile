@@ -7,7 +7,8 @@ COPY package*.json ./
 FROM base AS dev
 RUN npm install
 COPY . .
-CMD ["npm", "run", "dev"]
+# Bind to 0.0.0.0 and port 3001 for Docker dev access
+CMD ["npm", "run", "dev", "--", "-H", "0.0.0.0", "-p", "3001"]
 
 ######## BUILD ########
 FROM base AS build
@@ -19,7 +20,7 @@ RUN npm run build
 FROM node:20-alpine AS prod
 WORKDIR /app
 
-# Copy only production dependencies
+# Install only production deps
 COPY package*.json ./
 RUN npm install --omit=dev
 
@@ -29,5 +30,6 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
 
-EXPOSE 3000
+# Expose port 3001 for production
+EXPOSE 3001
 CMD ["npm", "start"]

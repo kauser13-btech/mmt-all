@@ -1,4 +1,7 @@
+version: "3.9"
+
 services:
+  # Laravel App
   app:
     build:
       context: ./backend
@@ -25,6 +28,7 @@ services:
       - "FONT_END_BASE=${FONT_END_BASE:-http://localhost:3001/api/revalidate}"
       - "APP_DEBUG=${APP_DEBUG:-true}"
 
+  # Nginx
   nginx:
     image: nginx:1.25-alpine
     container_name: laravel_nginx
@@ -38,6 +42,7 @@ services:
     depends_on:
       - app
 
+  # MariaDB
   mariadb:
     image: mariadb:11
     container_name: laravel_mariadb
@@ -50,10 +55,10 @@ services:
     volumes:
       - mariadb_data:/var/lib/mysql
       - ./docker/mariadb/my.cnf:/etc/mysql/conf.d/my.cnf:ro
-      # - ./docker/mariadb/initdb.d:/docker-entrypoint-initdb.d:ro
     networks:
       - laravel
 
+  # Redis
   redis:
     image: redis:7-alpine
     container_name: laravel_redis
@@ -64,6 +69,7 @@ services:
     networks:
       - laravel
 
+  # Frontend Next.js
   next:
     build:
       context: ./frontend
@@ -83,8 +89,9 @@ services:
       - REVALIDATION_TOKEN=${REVALIDATION_TOKEN:-'N0Sug@r'}
     depends_on:
       - nginx
-    command: ["npm","run","dev"]
+    command: ["npm","run","dev","--","-H","0.0.0.0","-p","3000"]
 
+  # Admin Next.js
   adminfromt:
     build:
       context: ./admin
@@ -92,7 +99,7 @@ services:
       target: ${NEXT_ENV:-dev}   # dev | prod
     container_name: admin
     ports:
-      - "${NEXT_ADMIN_PORT:-3001}:3000"   # container always listens on 3000
+      - "${NEXT_ADMIN_PORT:-3001}:3001"
     volumes:
       - ./admin:/app
       - /app/node_modules
@@ -104,7 +111,7 @@ services:
       - REVALIDATION_TOKEN=${REVALIDATION_TOKEN:-'N0Sug@r'}
     depends_on:
       - nginx
-    command: ["npm","run","dev"]
+    command: ["npm","run","dev","--","-H","0.0.0.0","-p","3001"]
 
 volumes:
   mariadb_data:
