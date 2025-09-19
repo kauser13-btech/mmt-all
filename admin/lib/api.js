@@ -138,4 +138,113 @@ export const dashboardAPI = {
   }
 }
 
+export const sneakersAPI = {
+  getAll: async (page = 1, limit = 10, search = '') => {
+    const params = new URLSearchParams({ page, limit })
+    if (search) params.append('search', search)
+    const response = await api.get(`/sneakers?${params.toString()}`)
+    return response.data
+  },
+
+  getById: async (id) => {
+    const response = await api.get(`/sneakers/${id}`)
+    return response.data
+  },
+
+  create: async (sneakerData) => {
+    const response = await api.post('/sneakers', sneakerData)
+    return response.data
+  },
+
+  update: async (id, sneakerData) => {
+    const response = await api.put(`/sneakers/${id}`, sneakerData)
+    return response.data
+  },
+
+  delete: async (id) => {
+    const response = await api.delete(`/sneakers/${id}`)
+    return response.data
+  }
+}
+
+export const categoriesAPI = {
+  getBrands: async () => {
+    const response = await api.get('/categories/brands')
+    return response.data
+  },
+
+  getSubModelCategories: async (brandId) => {
+    const response = await api.get(`/categories/sub-model-categories?brand_id=${brandId}`)
+    return response.data
+  },
+
+  getModels: async (subModelCategoryId) => {
+    const response = await api.get(`/categories/models?sub_model_category_id=${subModelCategoryId}`)
+    return response.data
+  },
+
+  getAll: async (typeId, parentId) => {
+    const params = new URLSearchParams()
+    if (typeId) params.append('type_id', typeId)
+    if (parentId !== undefined) params.append('parent_id', parentId)
+    const response = await api.get(`/categories?${params.toString()}`)
+    return response.data
+  }
+}
+
+export const assetsAPI = {
+  upload: async (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const token = Cookies.get('token')
+    const response = await fetch(`${API_URL.replace(/\/$/, '')}/assets/upload`, {
+      method: 'POST',
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : '',
+        'Accept': 'application/json',
+      },
+      credentials: 'include',
+      body: formData,
+    })
+
+    if (response.status === 401) {
+      Cookies.remove('token')
+      Cookies.remove('user')
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login'
+      }
+    }
+
+    if (!response.ok) {
+      const error = new Error(`HTTP ${response.status}`)
+      error.response = {
+        status: response.status,
+        statusText: response.statusText,
+        data: await response.json().catch(() => ({}))
+      }
+      throw error
+    }
+
+    return response.json()
+  },
+
+  getAll: async (page = 1, limit = 20, search = '') => {
+    const params = new URLSearchParams({ page, limit })
+    if (search) params.append('search', search)
+    const response = await api.get(`/assets?${params.toString()}`)
+    return response.data
+  },
+
+  getById: async (id) => {
+    const response = await api.get(`/assets/${id}`)
+    return response.data
+  },
+
+  delete: async (id) => {
+    const response = await api.delete(`/assets/${id}`)
+    return response.data
+  }
+}
+
 export default api
