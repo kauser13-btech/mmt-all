@@ -4,7 +4,8 @@ FROM php:8.3-fpm
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
         git unzip libpng-dev libonig-dev libxml2-dev libzip-dev supervisor cron \
- && docker-php-ext-configure gd \
+        libjpeg-dev libfreetype6-dev libwebp-dev \
+ && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
  && docker-php-ext-install -j$(nproc) pdo_mysql mbstring exif pcntl bcmath gd zip \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
