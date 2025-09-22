@@ -5,8 +5,30 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../../../../contexts/AuthContext'
 import { sneakersAPI, categoriesAPI, assetsAPI } from '../../../../lib/api'
+import ColorDropdown from '../../../../components/ColorDropdown'
 
 export default function CreateSneakerPage() {
+  const colorOptions = [
+    { name: 'Black', value: '#000000', bgClass: 'bg-black' },
+    { name: 'White', value: '#ffffff', bgClass: 'bg-white border border-gray-300' },
+    { name: 'Red', value: '#dc2626', bgClass: 'bg-red-600' },
+    { name: 'Blue', value: '#3b82f6', bgClass: 'bg-blue-600' },
+    { name: 'Green', value: '#22c55e', bgClass: 'bg-green-500' },
+    { name: 'Yellow', value: '#eab308', bgClass: 'bg-yellow-500' },
+    { name: 'Orange', value: '#f97316', bgClass: 'bg-orange-500' },
+    { name: 'Purple', value: '#a855f7', bgClass: 'bg-purple-500' },
+    { name: 'Pink', value: '#ec4899', bgClass: 'bg-pink-500' },
+    { name: 'Brown', value: '#a3524c', bgClass: 'bg-amber-800' },
+    { name: 'Gray', value: '#6b7280', bgClass: 'bg-gray-500' },
+    { name: 'Navy', value: '#1e3a8a', bgClass: 'bg-blue-800' },
+    { name: 'Maroon', value: '#7c2d12', bgClass: 'bg-red-800' },
+    { name: 'Beige', value: '#f5f5dc', bgClass: 'bg-yellow-100 border border-gray-300' },
+    { name: 'Tan', value: '#d2b48c', bgClass: 'bg-yellow-200' },
+    { name: 'Gold', value: '#fbbf24', bgClass: 'bg-yellow-400' },
+    { name: 'Silver', value: '#e5e7eb', bgClass: 'bg-gray-300' },
+    { name: 'Multi-Color', value: 'linear-gradient(45deg, #ff0000, #00ff00, #0000ff)', bgClass: 'bg-gradient-to-r from-red-500 via-green-500 to-blue-500' }
+  ]
+
   const [formData, setFormData] = useState({
     title: '',
     original_title: '',
@@ -18,7 +40,7 @@ export default function CreateSneakerPage() {
     status: 1,
     is_feed: false,
     sneaker_color: '',
-    preferred_color: 'Black',
+    preferred_color: '',
     colors: ''
   })
   const [brands, setBrands] = useState([])
@@ -44,6 +66,13 @@ export default function CreateSneakerPage() {
       fetchBrands()
     }
   }, [isAuthenticated])
+
+  useEffect(() => {
+    if (colorPalette.length > 0) {
+      const colorNames = colorPalette.map(c => c.name).join('/')
+      setFormData(prev => ({ ...prev, sneaker_color: colorNames }))
+    }
+  }, [colorPalette])
 
   const fetchBrands = async () => {
     try {
@@ -87,12 +116,39 @@ export default function CreateSneakerPage() {
       setModels([])
       if (value) {
         fetchSubModelCategories(value)
+        const selectedBrand = brands.find(brand => brand.id == value)
+        if (selectedBrand) {
+          setFormData(prev => ({ ...prev, description: selectedBrand.description || selectedBrand.title }))
+        }
+      } else {
+        setFormData(prev => ({ ...prev, description: '' }))
       }
     } else if (name === 'sub_model_category_id') {
       setFormData(prev => ({ ...prev, model_id: '' }))
       setModels([])
       if (value) {
         fetchModels(value)
+        const selectedCategory = subModelCategories.find(category => category.id == value)
+        if (selectedCategory) {
+          setFormData(prev => ({ ...prev, description: selectedCategory.description || selectedCategory.title }))
+        }
+      } else {
+        const selectedBrand = brands.find(brand => brand.id == formData.brand_id)
+        if (selectedBrand) {
+          setFormData(prev => ({ ...prev, description: selectedBrand.description || selectedBrand.title }))
+        }
+      }
+    } else if (name === 'model_id') {
+      if (value) {
+        const selectedModel = models.find(model => model.id == value)
+        if (selectedModel) {
+          setFormData(prev => ({ ...prev, description: selectedModel.description || selectedModel.title }))
+        }
+      } else {
+        const selectedCategory = subModelCategories.find(category => category.id == formData.sub_model_category_id)
+        if (selectedCategory) {
+          setFormData(prev => ({ ...prev, description: selectedCategory.description || selectedCategory.title }))
+        }
       }
     }
   }
@@ -419,7 +475,7 @@ export default function CreateSneakerPage() {
                               ))}
                             </div>
                             <div className="text-xs text-gray-500">
-                              Dominant colors: {colorPalette.slice(0, 3).map(c => c.name).join(', ')}
+                              Dominant colors: {colorPalette.map(c => c.name).join(', ')}
                             </div>
                           </div>
                         )}
@@ -448,17 +504,16 @@ export default function CreateSneakerPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="preferred_color" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="preferred_color" className="block text-sm font-medium text-gray-700 mb-1">
                       Preferred Color *
                     </label>
-                    <input
-                      type="text"
-                      name="preferred_color"
-                      id="preferred_color"
-                      required
+                    <ColorDropdown
                       value={formData.preferred_color}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required={true}
+                      colors={colorOptions}
+                      name="preferred_color"
+                      placeholder="Select a preferred color..."
                     />
                   </div>
 

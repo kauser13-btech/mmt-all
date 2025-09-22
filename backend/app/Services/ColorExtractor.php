@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Exception;
+use App\Services\ColorConverter;
 
 class ColorExtractor
 {
@@ -168,7 +169,7 @@ class ColorExtractor
             $rgb = $this->hexToRgb($hex);
             $palette[] = [
                 'color' => $hex,
-                'name' => $this->getColorName($hex),
+                'name' => ColorConverter::hexToColorName($hex),
                 'count' => 1,
                 'rgb' => $rgb,
                 'hsl' => $this->rgbToHsl($rgb['r'], $rgb['g'], $rgb['b'])
@@ -249,33 +250,6 @@ class ColorExtractor
         ];
     }
 
-    /**
-     * Get basic color name from hex
-     */
-    private function getColorName($hex)
-    {
-        $rgb = $this->hexToRgb($hex);
-        $r = $rgb['r'];
-        $g = $rgb['g'];
-        $b = $rgb['b'];
-
-        // Simple color naming logic
-        if ($r > 200 && $g < 100 && $b < 100) return 'Red';
-        if ($r < 100 && $g > 200 && $b < 100) return 'Green';
-        if ($r < 100 && $g < 100 && $b > 200) return 'Blue';
-        if ($r > 200 && $g > 200 && $b < 100) return 'Yellow';
-        if ($r > 200 && $g < 100 && $b > 200) return 'Magenta';
-        if ($r < 100 && $g > 200 && $b > 200) return 'Cyan';
-        if ($r > 150 && $g > 100 && $b < 100) return 'Orange';
-        if ($r > 100 && $g < 100 && $b > 100) return 'Purple';
-        if ($r > 150 && $g > 100 && $b > 100) return 'Pink';
-        if ($r > 100 && $g > 80 && $b < 80) return 'Brown';
-        if ($r < 100 && $g < 100 && $b < 100) return 'Black';
-        if ($r > 200 && $g > 200 && $b > 200) return 'White';
-        if ($r > 100 && $g > 100 && $b > 100) return 'Gray';
-
-        return 'Mixed';
-    }
 
     /**
      * Fallback method for basic color info when GD is not available
@@ -305,7 +279,7 @@ class ColorExtractor
             if (strpos($filename, $keyword) !== false) {
                 $colors[] = [
                     'color' => $colorInfo['color'],
-                    'name' => $colorInfo['name'],
+                    'name' => ColorConverter::hexToColorName($colorInfo['color']),
                     'count' => 1
                 ];
             }
@@ -314,9 +288,9 @@ class ColorExtractor
         // If no colors found in filename, return default sneaker colors
         if (empty($colors)) {
             $colors = [
-                ['color' => '#171717', 'name' => 'Black', 'count' => 1],
-                ['color' => '#f8fafc', 'name' => 'White', 'count' => 1],
-                ['color' => '#6b7280', 'name' => 'Gray', 'count' => 1]
+                ['color' => '#171717', 'name' => ColorConverter::hexToColorName('#171717'), 'count' => 1],
+                ['color' => '#f8fafc', 'name' => ColorConverter::hexToColorName('#f8fafc'), 'count' => 1],
+                ['color' => '#6b7280', 'name' => ColorConverter::hexToColorName('#6b7280'), 'count' => 1]
             ];
         }
 

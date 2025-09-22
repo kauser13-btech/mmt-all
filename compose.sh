@@ -22,3 +22,5 @@ docker compose exec app php artisan key:generate
 docker compose exec app php artisan migrate --force
 docker compose exec app supervisorctl restart laravel-queue:*
 docker compose exec next sh
+
+docker system prune -a --volumes -f

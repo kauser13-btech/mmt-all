@@ -25,7 +25,6 @@ class CategoryController extends Controller
         $categories = $query->select('id', 'title', 'parent_id', 'type')
                            ->orderBy('title')
                            ->get();
-
         return response()->json([
             'data' => $categories
         ]);
@@ -36,7 +35,7 @@ class CategoryController extends Controller
         $brands = Category::where('type', 2)
                          ->where('parent_id', 0)
                          ->where('status', 1)
-                         ->select('id', 'title')
+                         ->select('id', 'title', 'description')
                          ->orderBy('title')
                          ->get();
 
@@ -56,7 +55,7 @@ class CategoryController extends Controller
         $subModelCategories = Category::where('type', 2)
                                     ->where('parent_id', $brandId)
                                     ->where('status', 1)
-                                    ->select('id', 'title')
+                                    ->select('id', 'title', 'description')
                                     ->orderBy('title')
                                     ->get();
 
@@ -76,7 +75,7 @@ class CategoryController extends Controller
         $models = Category::where('type', 2)
                          ->where('parent_id', $subModelCategoryId)
                          ->where('status', 1)
-                         ->select('id', 'title')
+                         ->select('id', 'title', 'description')
                          ->orderBy('title')
                          ->get();
 
