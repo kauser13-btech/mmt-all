@@ -186,8 +186,8 @@ export default function SneakerDetailPage() {
                   </div>
 
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Image Asset ID</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{sneaker.image || 'N/A'}</dd>
+                    <dt className="text-sm font-medium text-gray-500">Asset ID</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{sneaker.asset_id || 'N/A'}</dd>
                   </div>
 
                   <div>

@@ -15,7 +15,7 @@ class Sneaker extends Model
         'sub_model_category_id',
         'model_id',
         'description',
-        'image',
+        'asset_id',
         'status',
         'is_feed',
         'sneaker_color',
@@ -28,7 +28,7 @@ class Sneaker extends Model
         'brand_id' => 'integer',
         'sub_model_category_id' => 'integer',
         'model_id' => 'integer',
-        'image' => 'integer',
+        'asset_id' => 'integer',
         'status' => 'integer',
         'is_feed' => 'boolean'
     ];
@@ -53,8 +53,13 @@ class Sneaker extends Model
         return $this->belongsTo(SneakerModel::class, 'model_id');
     }
 
-    public function image()
+    public function asset()
     {
-        return $this->belongsTo(Asset::class, 'image');
+        return $this->belongsTo(Asset::class, 'asset_id');
+    }
+
+    public function specificColors()
+    {
+        return $this->hasMany(SpecificColor::class);
     }
 }

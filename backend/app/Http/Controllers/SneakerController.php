@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Sneaker;
+use App\Models\SpecificColor;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class SneakerController extends Controller
 {
@@ -37,7 +39,7 @@ class SneakerController extends Controller
 
     public function show($id)
     {
-        $sneaker = Sneaker::with('user:id,name,email')->findOrFail($id);
+        $sneaker = Sneaker::with(['user:id,name,email', 'specificColors', 'asset'])->findOrFail($id);
 
         return response()->json([
             'data' => $sneaker
@@ -53,17 +55,27 @@ class SneakerController extends Controller
             'sub_model_category_id' => 'nullable|integer',
             'model_id' => 'nullable|integer',
             'description' => 'nullable|string',
-            'image' => 'nullable|integer',
+            'asset_id' => 'nullable|integer',
             'status' => 'required|integer',
             'is_feed' => 'boolean',
             'sneaker_color' => 'nullable|string|max:125',
             'preferred_color' => 'string|max:125',
-            'colors' => 'required|string|max:125'
+            'color_sequences' => 'nullable|array',
+            'color_sequences.*.color_name' => 'required|string|max:125',
+            'color_sequences.*.color_code' => 'required|string|max:7',
+            'color_sequences.*.color_sequence' => 'nullable|array'
         ]);
 
         $validated['user_id'] = auth()->id();
         $validated['slug'] = Str::slug($validated['title']);
         $validated['preferred_color'] = $validated['preferred_color'] ?? 'Black';
+
+        // Auto-generate colors field from color_sequences
+        $colorSequences = $validated['color_sequences'] ?? [];
+        if (!empty($colorSequences)) {
+            $colorCodes = array_column($colorSequences, 'color_code');
+            $validated['colors'] = implode(',', $colorCodes);
+        }
 
         $counter = 1;
         $originalSlug = $validated['slug'];
@@ -72,12 +84,27 @@ class SneakerController extends Controller
             $counter++;
         }
 
-        $sneaker = Sneaker::create($validated);
+        return DB::transaction(function () use ($validated) {
+            $colorSequences = $validated['color_sequences'] ?? [];
+            unset($validated['color_sequences']);
 
-        return response()->json([
-            'data' => $sneaker->load('user:id,name,email'),
-            'message' => 'Sneaker created successfully'
-        ], 201);
+            $sneaker = Sneaker::create($validated);
+
+            if (!empty($colorSequences)) {
+                foreach ($colorSequences as $colorData) {
+                    $sneaker->specificColors()->create([
+                        'color_name' => $colorData['color_name'],
+                        'color_code' => $colorData['color_code'],
+                        'color_sequence' => $colorData['color_sequence'] ?? null
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'data' => $sneaker->load(['user:id,name,email', 'specificColors']),
+                'message' => 'Sneaker created successfully'
+            ], 201);
+        });
     }
 
     public function update(Request $request, $id)
@@ -91,13 +118,23 @@ class SneakerController extends Controller
             'sub_model_category_id' => 'nullable|integer',
             'model_id' => 'nullable|integer',
             'description' => 'nullable|string',
-            'image' => 'nullable|integer',
+            'asset_id' => 'nullable|integer',
             'status' => 'required|integer',
             'is_feed' => 'boolean',
             'sneaker_color' => 'nullable|string|max:125',
             'preferred_color' => 'string|max:125',
-            'colors' => 'required|string|max:125'
+            'color_sequences' => 'nullable|array',
+            'color_sequences.*.color_name' => 'required|string|max:125',
+            'color_sequences.*.color_code' => 'required|string|max:7',
+            'color_sequences.*.color_sequence' => 'nullable|array'
         ]);
+
+        // Auto-generate colors field from color_sequences
+        $colorSequences = $validated['color_sequences'] ?? [];
+        if (!empty($colorSequences)) {
+            $colorCodes = array_column($colorSequences, 'color_code');
+            $validated['colors'] = implode(',', $colorCodes);
+        }
 
         if ($validated['title'] !== $sneaker->title) {
             $validated['slug'] = Str::slug($validated['title']);
@@ -110,12 +147,31 @@ class SneakerController extends Controller
             }
         }
 
-        $sneaker->update($validated);
+        return DB::transaction(function () use ($validated, $sneaker) {
+            $colorSequences = $validated['color_sequences'] ?? [];
+            unset($validated['color_sequences']);
 
-        return response()->json([
-            'data' => $sneaker->load('user:id,name,email'),
-            'message' => 'Sneaker updated successfully'
-        ]);
+            $sneaker->update($validated);
+
+            if (isset($colorSequences)) {
+                $sneaker->specificColors()->delete();
+
+                if (!empty($colorSequences)) {
+                    foreach ($colorSequences as $colorData) {
+                        $sneaker->specificColors()->create([
+                            'color_name' => $colorData['color_name'],
+                            'color_code' => $colorData['color_code'],
+                            'color_sequence' => $colorData['color_sequence'] ?? null
+                        ]);
+                    }
+                }
+            }
+
+            return response()->json([
+                'data' => $sneaker->load(['user:id,name,email', 'specificColors']),
+                'message' => 'Sneaker updated successfully'
+            ]);
+        });
     }
 
     public function destroy($id)

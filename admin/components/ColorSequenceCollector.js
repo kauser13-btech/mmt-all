@@ -19,8 +19,9 @@ export default function ColorSequenceCollector({
   const addSequence = () => {
     const newSequence = {
       id: Date.now(),
-      defaultColor: '',
-      colorSequence: []
+      color_name: '',
+      color_code: '',
+      color_sequence: []
     }
     const updatedSequences = [...sequences, newSequence]
     setSequences(updatedSequences)
@@ -45,29 +46,29 @@ export default function ColorSequenceCollector({
     onChange(updatedSequences)
   }
 
-  const handleDefaultColorSelect = (sequenceId, colorName, setIsOpen) => {
-    updateSequence(sequenceId, { defaultColor: colorName })
+  const handleDefaultColorSelect = (sequenceId, colorName, colorCode, setIsOpen) => {
+    updateSequence(sequenceId, { color_name: colorName, color_code: colorCode })
     setIsOpen(false)
   }
 
   const handleColorChange = (sequenceId, colorIndex, newColor) => {
     const sequence = sequences.find(seq => seq.id === sequenceId)
-    const updatedColorSequence = sequence.colorSequence.map((color, i) =>
+    const updatedColorSequence = sequence.color_sequence.map((color, i) =>
       i === colorIndex ? newColor : color
     )
-    updateSequence(sequenceId, { colorSequence: updatedColorSequence })
+    updateSequence(sequenceId, { color_sequence: updatedColorSequence })
   }
 
   const addColorToSequence = (sequenceId) => {
     const sequence = sequences.find(seq => seq.id === sequenceId)
-    const updatedColorSequence = [...sequence.colorSequence, '#000000']
-    updateSequence(sequenceId, { colorSequence: updatedColorSequence })
+    const updatedColorSequence = [...sequence.color_sequence, '#000000']
+    updateSequence(sequenceId, { color_sequence: updatedColorSequence })
   }
 
   const removeColorFromSequence = (sequenceId, colorIndex) => {
     const sequence = sequences.find(seq => seq.id === sequenceId)
-    const updatedColorSequence = sequence.colorSequence.filter((_, i) => i !== colorIndex)
-    updateSequence(sequenceId, { colorSequence: updatedColorSequence })
+    const updatedColorSequence = sequence.color_sequence.filter((_, i) => i !== colorIndex)
+    updateSequence(sequenceId, { color_sequence: updatedColorSequence })
   }
 
   return (
@@ -120,7 +121,7 @@ function ColorSequenceItem({
 }) {
   const [isDefaultOpen, setIsDefaultOpen] = useState(false)
 
-  const selectedDefaultColor = defaultColors.find(color => color.name === sequence.defaultColor)
+  const selectedDefaultColor = defaultColors.find(color => color.color_code === sequence.color_code)
 
   return (
     <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
@@ -155,8 +156,11 @@ function ColorSequenceItem({
               <div className="flex items-center gap-3">
                 {selectedDefaultColor ? (
                   <>
-                    <div className={`w-4 h-4 rounded-full ${selectedDefaultColor.bgClass}`}></div>
-                    <span className="text-gray-700">{selectedDefaultColor.name}</span>
+                    <div
+                      className="w-4 h-4 rounded-full border border-gray-300"
+                      style={{ backgroundColor: selectedDefaultColor.color_code }}
+                    ></div>
+                    <span className="text-gray-700">{selectedDefaultColor.color_name}</span>
                   </>
                 ) : (
                   <span className="text-gray-500">Select a default color...</span>
@@ -170,13 +174,16 @@ function ColorSequenceItem({
                 <div className="py-1">
                   {defaultColors.map((color) => (
                     <button
-                      key={color.name}
+                      key={color.color_code}
                       type="button"
-                      onClick={() => onDefaultColorSelect(sequence.id, color.name, setIsDefaultOpen)}
+                      onClick={() => onDefaultColorSelect(sequence.id, color.color_name, color.color_code, setIsDefaultOpen)}
                       className="w-full px-3 py-2 flex items-center gap-3 hover:bg-gray-50 text-left focus:outline-none focus:bg-gray-50"
                     >
-                      <div className={`w-4 h-4 rounded-full flex-shrink-0 ${color.bgClass}`}></div>
-                      <span className="text-gray-700">{color.name}</span>
+                      <div
+                        className="w-4 h-4 rounded-full flex-shrink-0 border border-gray-300"
+                        style={{ backgroundColor: color.color_code }}
+                      ></div>
+                      <span className="text-gray-700">{color.color_name}</span>
                     </button>
                   ))}
                 </div>
@@ -193,9 +200,9 @@ function ColorSequenceItem({
             </label>
           </div>
 
-          {sequence.colorSequence.length > 0 ? (
+          {sequence.color_sequence.length > 0 ? (
             <div className="space-y-2">
-              {sequence.colorSequence.map((color, colorIndex) => (
+              {sequence.color_sequence.map((color, colorIndex) => (
                 <div key={colorIndex} className="flex items-center space-x-3 bg-white p-3 rounded-lg border">
                   <input
                     type="color"

@@ -38,12 +38,11 @@ export default function CreateSneakerPage() {
     sub_model_category_id: '',
     model_id: '',
     description: '',
-    image: '',
+    asset_id: '',
     status: 1,
     is_feed: false,
     sneaker_color: '',
     preferred_color: '',
-    colors: '',
     default_color: '',
     color_sequences: []
   })
@@ -200,7 +199,7 @@ export default function CreateSneakerPage() {
       if (response.success) {
         setFormData(prev => ({
           ...prev,
-          image: response.data.id
+          asset_id: response.data.id
         }))
         setColorPalette(response.data.color_palette || [])
       } else {
@@ -217,7 +216,7 @@ export default function CreateSneakerPage() {
   }
 
   const removeImage = () => {
-    setFormData(prev => ({ ...prev, image: '' }))
+    setFormData(prev => ({ ...prev, asset_id: '' }))
     setPreviewImage(null)
     setColorPalette([])
     // Reset file input
@@ -441,20 +440,6 @@ export default function CreateSneakerPage() {
                       <h3 className="text-lg font-medium text-gray-900 mb-4">Color Information</h3>
                       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div>
-                          <label htmlFor="preferred_color" className="block text-sm font-medium text-gray-700 mb-1">
-                            Preferred Color *
-                          </label>
-                          <ColorDropdown
-                            value={formData.preferred_color}
-                            onChange={handleInputChange}
-                            required={true}
-                            colors={colorOptions}
-                            name="preferred_color"
-                            placeholder="Select a preferred color..."
-                          />
-                        </div>
-
-                        <div>
                           <label htmlFor="sneaker_color" className="block text-sm font-medium text-gray-700">
                             Sneaker Color
                           </label>
@@ -469,21 +454,6 @@ export default function CreateSneakerPage() {
                           />
                         </div>
 
-                        <div className="sm:col-span-2">
-                          <label htmlFor="colors" className="block text-sm font-medium text-gray-700">
-                            Colors *
-                          </label>
-                          <input
-                            type="text"
-                            name="colors"
-                            id="colors"
-                            required
-                            value={formData.colors}
-                            onChange={handleInputChange}
-                            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="e.g. Black/White/Red"
-                          />
-                        </div>
                       </div>
                     </div>
 
@@ -582,7 +552,7 @@ export default function CreateSneakerPage() {
                               type="button"
                               onClick={() => {
                                 setPreviewImage(null)
-                                setFormData(prev => ({ ...prev, image: '' }))
+                                setFormData(prev => ({ ...prev, asset_id: '' }))
                                 document.getElementById('image-upload').click()
                               }}
                               className="text-blue-600 hover:text-blue-700 font-medium"
@@ -594,16 +564,16 @@ export default function CreateSneakerPage() {
                       )}
 
                       <div className="mt-6">
-                        <label htmlFor="default_color" className="block text-sm font-medium text-gray-700 mb-1">
-                          Default Color
+                        <label htmlFor="preferred_color" className="block text-sm font-medium text-gray-700 mb-1">
+                          Preferred Color *
                         </label>
                         <ColorDropdown
-                          value={formData.default_color}
+                          value={formData.preferred_color}
                           onChange={handleInputChange}
-                          required={false}
+                          required={true}
                           colors={colorOptions}
-                          name="default_color"
-                          placeholder="Select a default color..."
+                          name="preferred_color"
+                          placeholder="Select a preferred color..."
                         />
                       </div>
 
@@ -614,8 +584,8 @@ export default function CreateSneakerPage() {
 
                       <input
                         type="hidden"
-                        name="image"
-                        value={formData.image}
+                        name="asset_id"
+                        value={formData.asset_id}
                       />
                     </div>
 
@@ -623,7 +593,10 @@ export default function CreateSneakerPage() {
                     <div className="bg-indigo-50 p-6 rounded-lg">
                       <h3 className="text-lg font-medium text-gray-900 mb-4">Color Sequences</h3>
                       <ColorSequenceCollector
-                        defaultColors={colorOptions}
+                        defaultColors={colorOptions.map(color => ({
+                          color_name: color.name,
+                          color_code: color.value
+                        }))}
                         onChange={handleColorSequencesChange}
                         value={formData.color_sequences}
                       />

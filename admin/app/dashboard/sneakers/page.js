@@ -230,23 +230,103 @@ export default function SneakersPage() {
                       <div className="text-sm text-gray-700">
                         Showing {sneakers.length} of {total} results
                       </div>
-                      <div className="flex space-x-2">
+                      <div className="flex items-center space-x-1">
+                        <button
+                          onClick={() => setCurrentPage(1)}
+                          disabled={currentPage === 1}
+                          className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 hover:bg-gray-50"
+                        >
+                          First
+                        </button>
                         <button
                           onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                           disabled={currentPage === 1}
-                          className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50"
+                          className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 hover:bg-gray-50"
                         >
                           Previous
                         </button>
-                        <span className="px-3 py-1 text-sm">
-                          Page {currentPage} of {totalPages}
-                        </span>
+
+                        {/* Page Numbers */}
+                        <div className="flex space-x-1">
+                          {(() => {
+                            const pages = [];
+                            const startPage = Math.max(1, currentPage - 2);
+                            const endPage = Math.min(totalPages, currentPage + 2);
+
+                            // Show first page if not in range
+                            if (startPage > 1) {
+                              pages.push(
+                                <button
+                                  key={1}
+                                  onClick={() => setCurrentPage(1)}
+                                  className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50"
+                                >
+                                  1
+                                </button>
+                              );
+                              if (startPage > 2) {
+                                pages.push(
+                                  <span key="start-ellipsis" className="px-2 py-1 text-sm text-gray-500">
+                                    ...
+                                  </span>
+                                );
+                              }
+                            }
+
+                            // Show page numbers in range
+                            for (let i = startPage; i <= endPage; i++) {
+                              pages.push(
+                                <button
+                                  key={i}
+                                  onClick={() => setCurrentPage(i)}
+                                  className={`px-3 py-1 border rounded text-sm ${
+                                    i === currentPage
+                                      ? 'bg-blue-600 text-white border-blue-600'
+                                      : 'border-gray-300 hover:bg-gray-50'
+                                  }`}
+                                >
+                                  {i}
+                                </button>
+                              );
+                            }
+
+                            // Show last page if not in range
+                            if (endPage < totalPages) {
+                              if (endPage < totalPages - 1) {
+                                pages.push(
+                                  <span key="end-ellipsis" className="px-2 py-1 text-sm text-gray-500">
+                                    ...
+                                  </span>
+                                );
+                              }
+                              pages.push(
+                                <button
+                                  key={totalPages}
+                                  onClick={() => setCurrentPage(totalPages)}
+                                  className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50"
+                                >
+                                  {totalPages}
+                                </button>
+                              );
+                            }
+
+                            return pages;
+                          })()}
+                        </div>
+
                         <button
                           onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                           disabled={currentPage === totalPages}
-                          className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50"
+                          className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 hover:bg-gray-50"
                         >
                           Next
+                        </button>
+                        <button
+                          onClick={() => setCurrentPage(totalPages)}
+                          disabled={currentPage === totalPages}
+                          className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 hover:bg-gray-50"
+                        >
+                          Last
                         </button>
                       </div>
                     </div>
