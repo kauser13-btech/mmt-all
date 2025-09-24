@@ -11,13 +11,15 @@ class Asset extends Model
         'asset_name',
         'asset_url',
         'status',
-        'storage_type'
+        'storage_type',
+        'color_palette'
     ];
 
     protected $casts = [
         'user_id' => 'integer',
         'status' => 'integer',
-        'storage_type' => 'integer'
+        'storage_type' => 'integer',
+        'color_palette' => 'json'
     ];
 
     const STORAGE_S3 = 1;

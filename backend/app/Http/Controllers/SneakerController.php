@@ -61,9 +61,10 @@ class SneakerController extends Controller
             'sneaker_color' => 'nullable|string|max:125',
             'preferred_color' => 'string|max:125',
             'color_sequences' => 'nullable|array',
-            'color_sequences.*.color_name' => 'required|string|max:125',
-            'color_sequences.*.color_code' => 'required|string|max:7',
-            'color_sequences.*.color_sequence' => 'nullable|array'
+            'color_sequences.*.color_name' => 'nullable|string|max:125',
+            'color_sequences.*.color_code' => 'nullable|string|max:7',
+            'color_sequences.*.color_sequence' => 'nullable|array',
+            'color_sequences.*.color_palette' => 'nullable|array'
         ]);
 
         $validated['user_id'] = auth()->id();
@@ -92,11 +93,15 @@ class SneakerController extends Controller
 
             if (!empty($colorSequences)) {
                 foreach ($colorSequences as $colorData) {
-                    $sneaker->specificColors()->create([
-                        'color_name' => $colorData['color_name'],
-                        'color_code' => $colorData['color_code'],
-                        'color_sequence' => $colorData['color_sequence'] ?? null
-                    ]);
+                    // Only save sequences that have both color_name and color_code
+                    if (!empty($colorData['color_name']) && !empty($colorData['color_code'])) {
+                        $sneaker->specificColors()->create([
+                            'color_name' => $colorData['color_name'],
+                            'color_code' => $colorData['color_code'],
+                            'color_sequence' => $colorData['color_sequence'] ?? null,
+                            'color_palette' => $colorData['color_palette'] ?? null
+                        ]);
+                    }
                 }
             }
 
@@ -124,9 +129,10 @@ class SneakerController extends Controller
             'sneaker_color' => 'nullable|string|max:125',
             'preferred_color' => 'string|max:125',
             'color_sequences' => 'nullable|array',
-            'color_sequences.*.color_name' => 'required|string|max:125',
-            'color_sequences.*.color_code' => 'required|string|max:7',
-            'color_sequences.*.color_sequence' => 'nullable|array'
+            'color_sequences.*.color_name' => 'nullable|string|max:125',
+            'color_sequences.*.color_code' => 'nullable|string|max:7',
+            'color_sequences.*.color_sequence' => 'nullable|array',
+            'color_sequences.*.color_palette' => 'nullable|array'
         ]);
 
         // Auto-generate colors field from color_sequences
@@ -158,11 +164,15 @@ class SneakerController extends Controller
 
                 if (!empty($colorSequences)) {
                     foreach ($colorSequences as $colorData) {
-                        $sneaker->specificColors()->create([
-                            'color_name' => $colorData['color_name'],
-                            'color_code' => $colorData['color_code'],
-                            'color_sequence' => $colorData['color_sequence'] ?? null
-                        ]);
+                        // Only save sequences that have both color_name and color_code
+                        if (!empty($colorData['color_name']) && !empty($colorData['color_code'])) {
+                            $sneaker->specificColors()->create([
+                                'color_name' => $colorData['color_name'],
+                                'color_code' => $colorData['color_code'],
+                                'color_sequence' => $colorData['color_sequence'] ?? null,
+                                'color_palette' => $colorData['color_palette'] ?? null
+                            ]);
+                        }
                     }
                 }
             }

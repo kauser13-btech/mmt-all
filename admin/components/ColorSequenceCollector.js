@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const ChevronDown = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -16,6 +16,12 @@ export default function ColorSequenceCollector({
   const [sequences, setSequences] = useState(value || [])
   const [isVisible, setIsVisible] = useState(false)
 
+  // Sync with incoming value prop
+  useEffect(() => {
+    setSequences(value || [])
+    setIsVisible(value && value.length > 0)
+  }, [value])
+
   const addSequence = () => {
     const newSequence = {
       id: Date.now(),
@@ -23,6 +29,7 @@ export default function ColorSequenceCollector({
       color_code: '',
       color_sequence: []
     }
+    // console.log('sequences', sequences);
     const updatedSequences = [...sequences, newSequence]
     setSequences(updatedSequences)
     setIsVisible(true)

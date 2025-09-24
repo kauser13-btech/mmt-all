@@ -10,12 +10,14 @@ class SpecificColor extends Model
         'sneaker_id',
         'color_name',
         'color_code',
-        'color_sequence'
+        'color_sequence',
+        'color_palette'
     ];
 
     protected $casts = [
         'sneaker_id' => 'integer',
-        'color_sequence' => 'json'
+        'color_sequence' => 'json',
+        'color_palette' => 'json'
     ];
 
     public function sneaker()

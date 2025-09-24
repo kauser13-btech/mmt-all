@@ -148,9 +148,10 @@ export default function EditSneakerPage() {
 
       // Convert specificColors to color_sequences format
       const colorSequences = sneaker.specific_colors?.map(sc => ({
+        id: sc.id || Date.now() + Math.random(), // Use database ID or generate unique ID
         color_name: sc.color_name,
         color_code: sc.color_code,
-        color_sequence: sc.color_sequence
+        color_sequence: sc.color_sequence || []
       })) || []
 
       setFormData({
@@ -168,6 +169,7 @@ export default function EditSneakerPage() {
         default_color: '',
         color_sequences: colorSequences
       })
+      
 
       if (sneaker.brand_id) {
         fetchSubModelCategories(sneaker.brand_id)
@@ -321,10 +323,13 @@ export default function EditSneakerPage() {
     setError('')
 
     try {
+      console.log('Submitting formData:', formData)
+      console.log('Color sequences:', formData.color_sequences)
       await sneakersAPI.update(id, formData)
       router.push(`/dashboard/sneakers/${id}`)
     } catch (error) {
       console.error('Error updating sneaker:', error)
+      console.error('Error response:', error.response?.data)
       setError(error.response?.data?.message || 'Failed to update sneaker')
     } finally {
       setLoading(false)
@@ -350,7 +355,7 @@ export default function EditSneakerPage() {
       </div>
     )
   }
-
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm border-b">

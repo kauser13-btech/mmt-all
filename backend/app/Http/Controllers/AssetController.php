@@ -65,7 +65,8 @@ class AssetController extends Controller
                 'asset_name' => $originalName,
                 'asset_url' => '/storage/' . $path,
                 'status' => Asset::STATUS_ACTIVE,
-                'storage_type' => Asset::STORAGE_LOCAL
+                'storage_type' => Asset::STORAGE_LOCAL,
+                'color_palette' => $colorPalette
             ]);
 
             return response()->json([
@@ -129,6 +130,7 @@ class AssetController extends Controller
                 'asset_url' => $asset->asset_url,
                 'full_url' => url($asset->asset_url),
                 'storage_type' => $asset->storage_type_name,
+                'color_palette' => $asset->color_palette,
                 'created_at' => $asset->created_at
             ]
         ]);
