@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Sneaker;
 use App\Models\SpecificColor;
+use App\Models\Asset;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
@@ -132,7 +133,10 @@ class SneakerController extends Controller
             'color_sequences.*.color_name' => 'nullable|string|max:125',
             'color_sequences.*.color_code' => 'nullable|string|max:7',
             'color_sequences.*.color_sequence' => 'nullable|array',
-            'color_sequences.*.color_palette' => 'nullable|array'
+            'color_sequences.*.color_palette' => 'nullable|array',
+            'colorPalette' => 'nullable|array',
+            'colorPalette.*.name' => 'nullable|string|max:125',
+            'colorPalette.*.color' => 'nullable|string|max:255'
         ]);
 
         // Auto-generate colors field from color_sequences
@@ -155,9 +159,19 @@ class SneakerController extends Controller
 
         return DB::transaction(function () use ($validated, $sneaker) {
             $colorSequences = $validated['color_sequences'] ?? [];
+            $colorPalette = $validated['colorPalette'] ?? null;
             unset($validated['color_sequences']);
+            unset($validated['colorPalette']);
 
             $sneaker->update($validated);
+
+            // Update Asset's color_palette if provided
+            if ($colorPalette !== null && !empty($validated['asset_id'])) {
+                $asset = Asset::find($validated['asset_id']);
+                if ($asset) {
+                    $asset->update(['color_palette' => $colorPalette]);
+                }
+            }
 
             if (isset($colorSequences)) {
                 $sneaker->specificColors()->delete();
@@ -178,7 +192,7 @@ class SneakerController extends Controller
             }
 
             return response()->json([
-                'data' => $sneaker->load(['user:id,name,email', 'specificColors']),
+                'data' => $sneaker->load(['user:id,name,email', 'specificColors', 'asset']),
                 'message' => 'Sneaker updated successfully'
             ]);
         });

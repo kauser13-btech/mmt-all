@@ -11,6 +11,7 @@ class CategoryController extends Controller
     {
         $typeId = $request->get('type_id');
         $parentId = $request->get('parent_id');
+        $search = $request->get('search');
 
         $query = Category::where('status', 1);
 
@@ -20,6 +21,10 @@ class CategoryController extends Controller
 
         if ($parentId !== null) {
             $query->where('parent_id', $parentId);
+        }
+
+        if ($search) {
+            $query->where('title', 'like', "%{$search}%");
         }
 
         $categories = $query->select('id', 'title', 'parent_id', 'type')

@@ -42,6 +42,7 @@ export default function ExtractedColorManager({ colors, onChange }) {
     updateColors(updatedColors)
   }
 
+  
   return (
     <div className="mt-4 p-4 bg-gray-50 rounded-lg">
       <div className="flex items-center justify-between mb-3">

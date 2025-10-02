@@ -61,7 +61,7 @@ export default function EditSneakerPage() {
   const router = useRouter()
   const params = useParams()
   const { id } = params
-
+  console.log('colorPalette',colorPalette);
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/login')
@@ -167,7 +167,7 @@ export default function EditSneakerPage() {
         sneaker_color: sneaker.sneaker_color || '',
         preferred_color: sneaker.preferred_color || 'Black',
         default_color: '',
-        color_sequences: colorSequences
+        color_sequences: colorSequences,
       })
       
 
@@ -325,7 +325,7 @@ export default function EditSneakerPage() {
     try {
       console.log('Submitting formData:', formData)
       console.log('Color sequences:', formData.color_sequences)
-      await sneakersAPI.update(id, formData)
+      await sneakersAPI.update(id, {...formData, colorPalette})
       router.push(`/dashboard/sneakers/${id}`)
     } catch (error) {
       console.error('Error updating sneaker:', error)

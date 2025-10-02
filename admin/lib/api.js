@@ -183,11 +183,41 @@ export const categoriesAPI = {
     return response.data
   },
 
-  getAll: async (typeId, parentId) => {
+  getAll: async (typeId, parentId, search = '') => {
     const params = new URLSearchParams()
     if (typeId) params.append('type_id', typeId)
     if (parentId !== undefined) params.append('parent_id', parentId)
+    if (search) params.append('search', search)
     const response = await api.get(`/categories?${params.toString()}`)
+    return response.data
+  }
+}
+
+export const designsAPI = {
+  getAll: async (page = 1, limit = 10, search = '') => {
+    const params = new URLSearchParams({ page, limit })
+    if (search) params.append('search', search)
+    const response = await api.get(`/designs?${params.toString()}`)
+    return response.data
+  },
+
+  getById: async (id) => {
+    const response = await api.get(`/designs/${id}`)
+    return response.data
+  },
+
+  create: async (designData) => {
+    const response = await api.post('/designs', designData)
+    return response.data
+  },
+
+  update: async (id, designData) => {
+    const response = await api.put(`/designs/${id}`, designData)
+    return response.data
+  },
+
+  delete: async (id) => {
+    const response = await api.delete(`/designs/${id}`)
     return response.data
   }
 }
