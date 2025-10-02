@@ -7,6 +7,7 @@ import { useAuth } from '../../../../../contexts/AuthContext'
 import { designsAPI, categoriesAPI } from '../../../../../lib/api'
 import TagInput from '../../../../../components/TagInput'
 import SearchableSelect from '../../../../../components/SearchableSelect'
+import SvgColorEditor from '../../../../../components/SvgColorEditor'
 
 export default function EditDesignPage() {
   const [formData, setFormData] = useState({
@@ -245,6 +246,15 @@ export default function EditDesignPage() {
                       placeholder="<svg>...</svg>"
                     />
                   </div>
+
+                  {formData.svg && (
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                      <SvgColorEditor
+                        svg={formData.svg}
+                        onChange={(updatedSvg) => setFormData(prev => ({ ...prev, svg: updatedSvg }))}
+                      />
+                    </div>
+                  )}
 
                   <div>
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700">
