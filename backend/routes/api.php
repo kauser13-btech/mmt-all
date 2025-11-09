@@ -9,6 +9,7 @@ use App\Http\Controllers\SneakerController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\DesignController;
+use App\Http\Controllers\ProductController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
@@ -52,5 +53,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', [DesignController::class, 'show']);
         Route::put('/{id}', [DesignController::class, 'update']);
         Route::delete('/{id}', [DesignController::class, 'destroy']);
+    });
+
+    Route::prefix('products')->group(function () {
+        Route::get('/', [ProductController::class, 'index']);
+        Route::post('/', [ProductController::class, 'store']);
+        Route::get('/{id}', [ProductController::class, 'show']);
+        Route::put('/{id}', [ProductController::class, 'update']);
+        Route::delete('/{id}', [ProductController::class, 'destroy']);
     });
 });

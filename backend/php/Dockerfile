@@ -5,8 +5,11 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends \
         git unzip libpng-dev libonig-dev libxml2-dev libzip-dev supervisor cron \
         libjpeg-dev libfreetype6-dev libwebp-dev \
+        libmagickwand-dev ghostscript \
  && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
  && docker-php-ext-install -j$(nproc) pdo_mysql mbstring exif pcntl bcmath gd zip \
+ && pecl install imagick \
+ && docker-php-ext-enable imagick \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 2. Composer

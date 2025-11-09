@@ -1,15 +1,50 @@
-import Link from "next/link";
+"use client";
 
+import Link from "next/link";
+import { useState, useEffect, useRef } from "react";
 
 import BurgerIcon from "@/components/svg/BurgerIcon";
 import MmtLogo from "@/components/svg/MmtLogo";
 
-import { Search, UserRound, ShoppingCart } from "lucide-react";
+import { Search, UserRound, ShoppingCart, LogOut } from "lucide-react";
+import AuthAPI from "@/lib/util/AuthAPI";
+import { useRouter } from "next/navigation";
 
 // import { useCloset } from "@/context/ClosetContex";
 // import TailwindDrawer from "@/components/global/drawerMenu/TailwindDrawer";
 
 const Navbar = () => {
+  const router = useRouter();
+  const [currentUser, setCurrentUser] = useState(null);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const user = AuthAPI.getCurrentUser();
+    setCurrentUser(user);
+  }, []);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    await AuthAPI.logout();
+    setCurrentUser(null);
+    setShowUserMenu(false);
+    router.push("/");
+  };
+
   // const { isClosetOpen, toggleCloset } = useCloset();
   // const { data } = useCloset();
 
@@ -74,7 +109,61 @@ const Navbar = () => {
         </ul>
         <div className="flex items-center gap-3">
           <Search size={28} className="cursor-pointer hover:scale-110 duration-200" />
-          <UserRound size={28} className="cursor-pointer hover:scale-110 duration-200" />
+
+          {/* User Menu */}
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="flex items-center gap-2 cursor-pointer hover:scale-110 duration-200"
+            >
+              <UserRound size={28} />
+              {currentUser && (
+                <span className="text-sm font-medium max-w-[100px] truncate hidden lg:block">
+                  {currentUser.name}
+                </span>
+              )}
+            </button>
+
+            {/* Dropdown Menu */}
+            {showUserMenu && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                {currentUser ? (
+                  <>
+                    <div className="px-4 py-2 border-b border-gray-200">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {currentUser.name}
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                    >
+                      <LogOut size={16} />
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/sign-in"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/sign-up"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+
           <ShoppingCart size={28} className="cursor-pointer hover:scale-110 duration-200" />
         </div>
       </nav>

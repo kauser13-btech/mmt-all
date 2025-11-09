@@ -16,7 +16,8 @@ class Design extends Model
         'status',
         'is_chosen',
         'is_featured',
-        'is_feed'
+        'is_feed',
+        'thumb'
     ];
 
     protected $casts = [

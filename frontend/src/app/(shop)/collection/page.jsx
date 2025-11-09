@@ -36,7 +36,7 @@ export default function CollectionPage() {
             >
               <div className="flex items-center justify-center gap-4">
                 <ClosetIcon color={"#6b7280"} />
-                <p className="w-[114.48px]md:text-sm xl:text-base">Open Closet</p>
+                <p className="w-[114.48px] md:text-sm xl:text-base">Open Closet</p>
               </div>
             </button>
           </div>

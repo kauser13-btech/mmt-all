@@ -8,7 +8,7 @@ export default function ProductContainer({ data, sneaker, design }) {
   );
 
   return (
-    <div className="w-full flex flex-col gap-6s md:gap-6 relative">
+    <div className="w-full flex flex-col gap-6 md:gap-6 relative">
       <h2 className="max-md:hidden w-full font-staatliches text-lg lg:text-2xl xl:text-[32px] font-normal text-sub-work-card">
         {data.title}
       </h2>
