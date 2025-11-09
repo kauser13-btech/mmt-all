@@ -38,11 +38,9 @@ const DescriptionHead = ({ data }) => {
           with a cold for like colors. Only use bleach without chlorine when
           necessary. Low tumble dry. If necessary, cool the iron.
         </div>
-        {data.type} - {data.title} - Sneaker-Matching{" "}
-        {data.type} ({data.design.title}) is a high quality
-        sneaker-matching {data.type} designed to match your{" "}
-        {data.title} sneakers. -This {data.type} is designed with
-        the exact colors to match with a premium look and feel. We only use the
+        {data.type} - {data.title} - {data.design ? `Sneaker-Matching ${data.type} (${data.design.title})` : `Premium ${data.type}`} is a high quality
+        {data.design ? `sneaker-matching ${data.type} designed to match your ${data.title} sneakers.` : `${data.type} with superior comfort and style.`} This {data.type} is designed with
+        {data.design ? ' the exact colors to match with' : ''} a premium look and feel. We only use the
         best materials and inks to produce our merchandise. All sizes are true
         to size.
       </div>
@@ -147,14 +145,16 @@ const DescriptionHead = ({ data }) => {
             Printed
           </div>
         </div>
-        <div className="flex items-center max-md:gap-5 justify-between md:px-4 border-b-[.5px] border-[#B1B5B8]">
-          <div className="text-base py-3 font-bold min-w-[118px] max-w-[118px] md:min-w-[166px] md:max-w-[166px] min-h-full">
-            Design Name
+        {data.design && (
+          <div className="flex items-center max-md:gap-5 justify-between md:px-4 border-b-[.5px] border-[#B1B5B8]">
+            <div className="text-base py-3 font-bold min-w-[118px] max-w-[118px] md:min-w-[166px] md:max-w-[166px] min-h-full">
+              Design Name
+            </div>
+            <div className="text-base py-3 font-normal flex-grow md:pl-5 capitalize md:border-l md:border-[#B1B5B8]">
+              {data.design.title}
+            </div>
           </div>
-          <div className="text-base py-3 font-normal flex-grow md:pl-5 capitalize md:border-l md:border-[#B1B5B8]">
-            {data.design.title}
-          </div>
-        </div>
+        )}
         <div className="flex items-center max-md:gap-5 justify-between md:px-4 border-b-[.5px] border-[#B1B5B8]">
           <div className="text-base py-3 font-bold min-w-[118px] max-w-[118px] md:min-w-[166px] md:max-w-[166px] min-h-full">
             Design Artist

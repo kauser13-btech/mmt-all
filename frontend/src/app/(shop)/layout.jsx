@@ -3,6 +3,7 @@ import { Montserrat, Staatliches, Roboto } from "next/font/google";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { CartProvider } from "@/context/CartContext";
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -53,19 +54,21 @@ export default function RootLayout({ children }) {
       <body
         className="bg-white text-gray-900"
       >
-        <div className="flex min-h-screen flex-col">
-          {/* Global Header */}
-          <Header />
+        <CartProvider>
+          <div className="flex min-h-screen flex-col">
+            {/* Global Header */}
+            <Header />
 
-          {/* Main Content */}
-          <main className="mx-auto w-full">
-            {children}
-          </main>
+            {/* Main Content */}
+            <main className="mx-auto w-full">
+              {children}
+            </main>
 
-          {/* Global Footer */}
-          <Footer />
-        </div>
-        <ToastContainer />
+            {/* Global Footer */}
+            <Footer />
+          </div>
+          <ToastContainer />
+        </CartProvider>
       </body >
     </html >
   );

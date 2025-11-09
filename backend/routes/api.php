@@ -10,13 +10,33 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\DesignController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CollectionItemController;
+use App\Http\Controllers\CartController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
+// Public collection routes
+Route::prefix('collections')->group(function () {
+    Route::get('/{type}', [CollectionItemController::class, 'index']);
+    Route::get('/{type}/{slug}', [CollectionItemController::class, 'show']);
+});
+
+// Public cart routes (works for both guest and authenticated users)
+Route::prefix('cart')->group(function () {
+    Route::get('/', [CartController::class, 'index']);
+    Route::post('/', [CartController::class, 'store']);
+    Route::put('/{id}', [CartController::class, 'update']);
+    Route::delete('/{id}', [CartController::class, 'destroy']);
+    Route::post('/clear', [CartController::class, 'clear']);
+});
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
+
+    // Merge guest cart with user cart after login
+    Route::post('/cart/merge', [CartController::class, 'merge']);
 
     Route::prefix('dashboard')->group(function () {
         Route::get('/stats', [DashboardController::class, 'stats']);
@@ -61,5 +81,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', [ProductController::class, 'show']);
         Route::put('/{id}', [ProductController::class, 'update']);
         Route::delete('/{id}', [ProductController::class, 'destroy']);
+    });
+
+    // Admin collection routes (protected)
+    Route::prefix('admin/collections')->group(function () {
+        Route::post('/', [CollectionItemController::class, 'store']);
+        Route::put('/{id}', [CollectionItemController::class, 'update']);
+        Route::delete('/{id}', [CollectionItemController::class, 'destroy']);
     });
 });

@@ -1,179 +1,203 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import ProductComponent from "@/components/global/ProductComponent";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-// ✅ Product Container
-export const ProductContainer = () => {
-  const products = [
+// ✅ Product Container with Pagination
+export const ProductContainer = ({ productType }) => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+    per_page: 20,
+    total: 0,
+  });
 
-    {
-      index: 1,
-      url: "/product/1",
-      image_url: "https://picsum.photos/id/123/800/600",
-      title: "sneaker one",
-      original_title: "Sneaker 1",
-      alt: "Sneaker One",
-    },
-    {
-      index: 2,
-      url: "/product/2",
-      image_url: "https://picsum.photos/id/124/800/600",
-      title: "sneaker two",
-      original_title: "Sneaker 2",
-      alt: "Sneaker Two",
-    },
-    {
-      index: 3,
-      url: "/product/3",
-      image_url: "https://picsum.photos/id/125/800/600",
-      title: "sneaker three",
-      original_title: "Sneaker 3",
-      alt: "Sneaker Three",
-    },
-    {
-      index: 4,
-      url: "/product/4",
-      image_url: "https://picsum.photos/id/126/800/600",
-      title: "sneaker four",
-      original_title: "Sneaker 4",
-      alt: "Sneaker Four",
-    },
-    {
-      index: 5,
-      url: "/product/5",
-      image_url: "https://picsum.photos/id/127/800/600",
-      title: "sneaker five",
-      original_title: "Sneaker 5",
-      alt: "Sneaker Five",
-    },
-    {
-      index: 6,
-      url: "/product/6",
-      image_url: "https://picsum.photos/id/128/800/600",
-      title: "sneaker six",
-      original_title: "Sneaker 6",
-      alt: "Sneaker Six",
-    },
-    {
-      index: 7,
-      url: "/product/7",
-      image_url: "https://picsum.photos/id/129/800/600",
-      title: "sneaker seven",
-      original_title: "Sneaker 7",
-      alt: "Sneaker Seven",
-    },
-    {
-      index: 8,
-      url: "/product/8",
-      image_url: "https://picsum.photos/id/130/800/600",
-      title: "sneaker eight",
-      original_title: "Sneaker 8",
-      alt: "Sneaker Eight",
-    },
-    {
-      index: 9,
-      url: "/product/9",
-      image_url: "https://picsum.photos/id/131/800/600",
-      title: "sneaker nine",
-      original_title: "Sneaker 9",
-      alt: "Sneaker Nine",
-    },
-    {
-      index: 10,
-      url: "/product/10",
-      image_url: "https://picsum.photos/id/132/800/600",
-      title: "sneaker ten",
-      original_title: "Sneaker 10",
-      alt: "Sneaker Ten",
-    },
-    {
-      index: 11,
-      url: "/product/11",
-      image_url: "https://picsum.photos/id/133/800/600",
-      title: "sneaker eleven",
-      original_title: "Sneaker 11",
-      alt: "Sneaker Eleven",
-    },
-    {
-      index: 12,
-      url: "/product/12",
-      image_url: "https://picsum.photos/id/134/800/600",
-      title: "sneaker twelve",
-      original_title: "Sneaker 12",
-      alt: "Sneaker Twelve",
-    },
-    {
-      index: 13,
-      url: "/product/13",
-      image_url: "https://picsum.photos/id/135/800/600",
-      title: "sneaker thirteen",
-      original_title: "Sneaker 13",
-      alt: "Sneaker Thirteen",
-    },
-    {
-      index: 14,
-      url: "/product/14",
-      image_url: "https://picsum.photos/id/136/800/600",
-      title: "sneaker fourteen",
-      original_title: "Sneaker 14",
-      alt: "Sneaker Fourteen",
-    },
-    {
-      index: 15,
-      url: "/product/15",
-      image_url: "https://picsum.photos/id/137/800/600",
-      title: "sneaker fifteen",
-      original_title: "Sneaker 15",
-      alt: "Sneaker Fifteen",
-    },
-    {
-      index: 16,
-      url: "/product/16",
-      image_url: "https://picsum.photos/id/101/800/600",
-      title: "sneaker sixteen",
-      original_title: "Sneaker 16",
-      alt: "Sneaker Sixteen",
-    },
-    {
-      index: 17,
-      url: "/product/17",
-      image_url: "https://picsum.photos/id/139/800/600",
-      title: "sneaker seventeen",
-      original_title: "Sneaker 17",
-      alt: "Sneaker Seventeen",
-    },
-    {
-      index: 18,
-      url: "/product/18",
-      image_url: "https://picsum.photos/id/140/800/600",
-      title: "sneaker eighteen",
-      original_title: "Sneaker 18",
-      alt: "Sneaker Eighteen",
-    },
-    {
-      index: 19,
-      url: "/product/19",
-      image_url: "https://picsum.photos/id/141/800/600",
-      title: "sneaker nineteen",
-      original_title: "Sneaker 19",
-      alt: "Sneaker Nineteen",
-    },
-    {
-      index: 20,
-      url: "/product/20",
-      image_url: "https://picsum.photos/id/142/800/600",
-      title: "sneaker twenty",
-      original_title: "Sneaker 20",
-      alt: "Sneaker Twenty",
-    },
-  ];
+  const fetchProducts = async (page = 1) => {
+    try {
+      setLoading(true);
+      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost/api';
+      const response = await fetch(`${apiUrl}/collections/${productType}?page=${page}&per_page=20`);
 
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+
+      const data = await response.json();
+
+      // Transform the API data to match the component's expected format
+      const transformedProducts = data.data.map((item) => ({
+        index: item.id,
+        url: `/collection/${productType}/${item.slug}`,
+        image_url: item.image,
+        title: item.title,
+        original_title: item.title,
+        alt: item.title,
+        price: item.price,
+        description: item.description,
+      }));
+
+      setProducts(transformedProducts);
+      setPagination(data.pagination);
+
+      // Scroll to top when page changes
+      if (page > 1) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (productType) {
+      fetchProducts(1);
+    }
+  }, [productType]);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.last_page) {
+      fetchProducts(newPage);
+    }
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    let start = Math.max(1, pagination.current_page - 2);
+    let end = Math.min(pagination.last_page, start + maxVisible - 1);
+
+    if (end - start < maxVisible - 1) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 w-full py-20">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-primary"></div>
+        <p className="text-gray-500">Loading products...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 w-full py-20">
+        <p className="text-red-500">Error: {error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-orange-primary text-white rounded-md hover:bg-orange-600"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 w-full py-20">
+        <p className="text-gray-500">No products found</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center gap-10 xl:gap-20 w-full">
+      {/* Product Grid */}
       <div className="grid gap-x-5 gap-y-7 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 w-full">
         {products.map((product) => (
           <ProductComponent key={product.index} product={product} />
         ))}
       </div>
+
+      {/* Pagination */}
+      {pagination.last_page > 1 && (
+        <div className="flex flex-col items-center gap-4 w-full">
+          {/* Pagination info */}
+          <p className="text-sm text-gray-600">
+            Showing {pagination.from} to {pagination.to} of {pagination.total} products
+          </p>
+
+          {/* Pagination controls */}
+          <div className="flex items-center gap-2">
+            {/* Previous button */}
+            <button
+              onClick={() => handlePageChange(pagination.current_page - 1)}
+              disabled={pagination.current_page === 1}
+              className="p-2 rounded-md border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Previous page"
+            >
+              <ChevronLeft size={20} />
+            </button>
+
+            {/* First page */}
+            {pagination.current_page > 3 && (
+              <>
+                <button
+                  onClick={() => handlePageChange(1)}
+                  className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50"
+                >
+                  1
+                </button>
+                {pagination.current_page > 4 && <span className="px-2">...</span>}
+              </>
+            )}
+
+            {/* Page numbers */}
+            {getPageNumbers().map((page) => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`px-4 py-2 rounded-md border ${
+                  page === pagination.current_page
+                    ? 'bg-orange-primary text-white border-orange-primary'
+                    : 'border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+
+            {/* Last page */}
+            {pagination.current_page < pagination.last_page - 2 && (
+              <>
+                {pagination.current_page < pagination.last_page - 3 && <span className="px-2">...</span>}
+                <button
+                  onClick={() => handlePageChange(pagination.last_page)}
+                  className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50"
+                >
+                  {pagination.last_page}
+                </button>
+              </>
+            )}
+
+            {/* Next button */}
+            <button
+              onClick={() => handlePageChange(pagination.current_page + 1)}
+              disabled={pagination.current_page === pagination.last_page}
+              className="p-2 rounded-md border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Next page"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

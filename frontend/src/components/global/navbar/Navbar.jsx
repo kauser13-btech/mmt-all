@@ -5,16 +5,19 @@ import { useState, useEffect, useRef } from "react";
 
 import BurgerIcon from "@/components/svg/BurgerIcon";
 import MmtLogo from "@/components/svg/MmtLogo";
+import CartDrawer from "@/components/cart/CartDrawer";
 
 import { Search, UserRound, ShoppingCart, LogOut } from "lucide-react";
 import AuthAPI from "@/lib/util/AuthAPI";
 import { useRouter } from "next/navigation";
+import { useCart } from "@/context/CartContext";
 
 // import { useCloset } from "@/context/ClosetContex";
 // import TailwindDrawer from "@/components/global/drawerMenu/TailwindDrawer";
 
 const Navbar = () => {
   const router = useRouter();
+  const { cartCount, setIsCartOpen } = useCart();
   const [currentUser, setCurrentUser] = useState(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef(null);
@@ -52,12 +55,12 @@ const Navbar = () => {
     {
       id: 1,
       name: "T-Shirts",
-      url: "/collection/?product_type=T-shirt"
+      url: "/collection/t-shirt"
     },
     {
       id: 2,
       name: "Hoodies",
-      url: "/collection/?product_type=Hoodie"
+      url: "/collection/hoodie"
     },
   ];
 
@@ -164,9 +167,23 @@ const Navbar = () => {
             )}
           </div>
 
-          <ShoppingCart size={28} className="cursor-pointer hover:scale-110 duration-200" />
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="relative cursor-pointer hover:scale-110 duration-200"
+          >
+            <ShoppingCart size={28} />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-orange-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </button>
         </div>
       </nav>
+
+      {/* Cart Drawer */}
+      <CartDrawer />
+
       {/* <MyCloset isClosetOpen={isClosetOpen} setIsOpen={toggleCloset} /> */}
 
 
