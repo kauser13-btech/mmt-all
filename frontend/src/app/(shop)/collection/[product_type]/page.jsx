@@ -2,16 +2,66 @@ import Breadcrumb from "@/components/global/Breadcrumb"
 import Sidebar from "@/components/collection/Sidebar"
 import Category from "@/components/collection/Category"
 import SearchBar from "@/components/collection/SearchBar"
-import { ProductContainer } from "@/components/collection/ProductContainer"
+import ProductListWithPagination from "@/components/collection/ProductListWithPagination";
 
 import ClosetIcon from "@/components/svg/ClosetIcon";
 
 import { SlidersHorizontal } from "lucide-react"
 
-export default function CollectionProductTypePage({ params }) {
+// Server-side function to fetch products
+async function getProducts(productType, page = 1) {
+  try {
+    const apiUrl = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost/api';
+    const response = await fetch(`${apiUrl}/collections/${productType}?page=${page}&per_page=20`, {
+      next: { revalidate: 600 } // Cache for 10 minutes (600 seconds)
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch products');
+    }
+
+    const data = await response.json();
+
+    // Transform the API data to match the component's expected format
+    const transformedProducts = data.data.map((item) => ({
+      index: item.id,
+      url: `/collection/${productType}/${item.slug}`,
+      image_url: item.mockup_url || item.image,
+      title: item.title,
+      original_title: item.title,
+      alt: item.title,
+      price: item.price,
+      description: item.description,
+    }));
+
+    return {
+      products: transformedProducts,
+      pagination: data.pagination
+    };
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return {
+      products: [],
+      pagination: {
+        current_page: 1,
+        last_page: 1,
+        per_page: 20,
+        total: 0
+      }
+    };
+  }
+}
+
+export default async function CollectionProductTypePage({ params, searchParams }) {
   // Format the product type for display (e.g., "T-shirt" or "Hoodie")
   const productType = params.product_type;
   const formattedType = productType.charAt(0).toUpperCase() + productType.slice(1).toLowerCase();
+
+  // Get page from search params
+  const page = parseInt(searchParams?.page || '1', 10);
+
+  // Fetch products on the server
+  const { products, pagination } = await getProducts(productType, page);
 
   return (
     <main>
@@ -44,8 +94,12 @@ export default function CollectionProductTypePage({ params }) {
             </button>
           </div>
 
-          {/* main Product List */}
-          <ProductContainer productType={productType} />
+          {/* main Product List with Pagination - Server-side rendered with client-side navigation */}
+          <ProductListWithPagination
+            initialProducts={products}
+            initialPagination={pagination}
+            productType={productType}
+          />
         </div>
       </div>
     </main>

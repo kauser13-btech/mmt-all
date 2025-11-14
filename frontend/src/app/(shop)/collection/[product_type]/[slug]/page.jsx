@@ -11,8 +11,7 @@ async function getProductData(product_type, slug) {
     // Use internal Docker network URL for server-side fetching
     const apiUrl = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost/api';
     const response = await fetch(`${apiUrl}/collections/${product_type}/${slug}`, {
-      cache: 'no-store', // Disable caching for dynamic data, or use 'force-cache' with revalidate
-      // next: { revalidate: 3600 } // Optional: Revalidate every hour
+      next: { revalidate: 600 } // Cache for 10 minutes (600 seconds)
     });
 
     if (!response.ok) {
@@ -26,18 +25,25 @@ async function getProductData(product_type, slug) {
       data: {
         id: result.data.id,
         title: result.data.title,
-        type: product_type === 't-shirt' ? 'T-shirt' : 'Hoodie',
-        color: "Multiple Colors Available",
+        slug: result.data.slug,
+        type: result.data.type || (product_type === 't-shirt' ? 'T-shirt' : 'Hoodie'),
+        color: result.data.color_name || "Multiple Colors Available",
         price: result.data.price,
         currency: "USD",
-        material: "Premium Cotton",
+        material: result.data.material || "Premium Cotton",
+        brand: result.data.brand,
+        weight: result.data.weight,
+        sku: result.data.sku,
         image_urls: [
-          { url: result.data.image },
+          // Use mockup_url if available, otherwise use the original image
+          { url: result.data.mockup_url || result.data.image },
           ...(result.data.images || []).map(url => ({ url }))
         ],
         sneaker: null,
         design: null,
-        available_colors: [
+        available_colors: result.data.color_name && result.data.color_code ? [
+          { name: result.data.color_name, code: result.data.color_code, is_selected: true },
+        ] : [
           { name: "Default", code: "#000000", is_selected: true },
         ],
         available_sizes: [
@@ -47,8 +53,8 @@ async function getProductData(product_type, slug) {
           { size: "XL", in_stock: true },
           { size: "XXL", in_stock: true },
         ],
-        description: result.data.description,
-        details: "100% premium cotton, machine washable, available in multiple sizes.",
+        description: result.data.description || `High-quality ${product_type} from MatchMyTees`,
+        details: `${result.data.material || '100% premium cotton'}, machine washable, available in multiple sizes.`,
       },
     };
   } catch (error) {
