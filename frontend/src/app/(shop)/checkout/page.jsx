@@ -80,7 +80,7 @@ export default function CheckoutPage() {
   const tax = cartTotal * 0.08; // 8% tax
   const total = cartTotal + shippingCost + tax;
 
-  if (cart.length === 0) {
+  if (!cart || cart.length === 0) {
     return (
       <main>
         <Breadcrumb title="Home > Checkout" />
@@ -273,7 +273,7 @@ export default function CheckoutPage() {
 
               {/* Cart Items */}
               <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
-                {cart.map((item) => (
+                {cart?.map((item) => (
                   <div key={`${item.id}-${item.size}-${item.color}`} className="flex gap-3">
                     <div className="relative w-16 h-16 flex-shrink-0">
                       <Image
