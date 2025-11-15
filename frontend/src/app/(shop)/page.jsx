@@ -1,11 +1,11 @@
 import Slider from "@/components/landing/Slider";
-import HowItWorKs from "@/components/landing/HowItWorKs";
+import HowItWorks from "@/components/landing/HowItWorks";
 
 export default function Home() {
   return (
     <div>
       <Slider />
-      <HowItWorKs />
+      <HowItWorks />
     </div>
   );
 }
