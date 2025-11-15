@@ -34,20 +34,17 @@ export default function Header() {
 
   const [onScroll, setOnScroll] = useState(false);
 
-  const handleScroll = () => {
-    const scrollY = window.scrollY;
-    if (scrollY > 20) {
-      setOnScroll(true);
-    } else {
-      setOnScroll(false);
-    }
-  };
-
-
   useEffect(() => {
-    if (!onScroll) {
-      handleScroll();
-    }
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      if (scrollY > 20) {
+        setOnScroll(true);
+      } else {
+        setOnScroll(false);
+      }
+    };
+
+    handleScroll();
     window.addEventListener("scroll", handleScroll);
 
     return () => {

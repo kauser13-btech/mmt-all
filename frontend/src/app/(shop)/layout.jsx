@@ -1,5 +1,6 @@
 import '../globals.css';
 import { Montserrat, Staatliches, Roboto } from "next/font/google";
+import { Suspense } from "react";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -57,7 +58,9 @@ export default function RootLayout({ children }) {
         <CartProvider>
           <div className="flex min-h-screen flex-col">
             {/* Global Header */}
-            <Header />
+            <Suspense fallback={<div />}>
+              <Header />
+            </Suspense>
 
             {/* Main Content */}
             <main className="mx-auto w-full">
