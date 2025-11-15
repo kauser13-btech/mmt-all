@@ -65,7 +65,8 @@ async function getProductData(product_type, slug) {
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }) {
-  const { product_type, slug } = params;
+  const resolvedParams = await params;
+  const { product_type, slug } = resolvedParams;
   const product = await getProductData(product_type, slug);
 
   if (!product) {
@@ -75,7 +76,7 @@ export async function generateMetadata({ params }) {
   }
 
   const { data } = product;
-  const formattedType = product_type.charAt(0).toUpperCase() + product_type.slice(1);
+  const formattedType = product_type?.charAt(0).toUpperCase() + product_type?.slice(1) || 'Product';
 
   return {
     title: `${data.title} | ${formattedType} | MatchMyTees`,
@@ -132,7 +133,8 @@ function ProductSchema({ product, product_type, slug }) {
 }
 
 export default async function CollectionItemDetailPage({ params }) {
-  const { product_type, slug } = params;
+  const resolvedParams = await params;
+  const { product_type, slug } = resolvedParams;
 
   // Fetch product data on the server
   const product = await getProductData(product_type, slug);
@@ -143,7 +145,7 @@ export default async function CollectionItemDetailPage({ params }) {
   }
 
   const { data } = product;
-  const formattedType = product_type.charAt(0).toUpperCase() + product_type.slice(1);
+  const formattedType = product_type?.charAt(0).toUpperCase() + product_type?.slice(1) || 'Product';
 
   return (
     <main>

@@ -53,9 +53,12 @@ async function getProducts(productType, page = 1) {
 }
 
 export default async function CollectionProductTypePage({ params, searchParams }) {
+  // Await params to resolve the Promise
+  const resolvedParams = await params;
+
   // Format the product type for display (e.g., "T-shirt" or "Hoodie")
-  const productType = params.product_type;
-  const formattedType = productType.charAt(0).toUpperCase() + productType.slice(1).toLowerCase();
+  const productType = resolvedParams.product_type;
+  const formattedType = productType?.charAt(0).toUpperCase() + productType?.slice(1).toLowerCase() || 'Products';
 
   // Get page from search params
   const page = parseInt(searchParams?.page || '1', 10);
