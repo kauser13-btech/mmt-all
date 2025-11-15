@@ -10,6 +10,14 @@ const nextConfig = {
                 protocol: "https",
                 hostname: "images.unsplash.com",
             },
+            {
+                protocol: "https",
+                hostname: "api.matchmytees.com",
+            },
+            {
+                protocol: "http",
+                hostname: "localhost",
+            },
         ],
     },
     experimental: {

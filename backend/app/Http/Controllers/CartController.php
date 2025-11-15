@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CartItem;
-use App\Models\CollectionItem;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -17,7 +17,7 @@ class CartController extends Controller
         $userId = $request->user()?->id;
         $sessionId = $request->input('session_id') ?: $request->session()->getId();
 
-        $query = CartItem::with('collectionItem');
+        $query = CartItem::with('product');
 
         if ($userId) {
             $query->where('user_id', $userId);
@@ -40,7 +40,7 @@ class CartController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'collection_item_id' => 'required|exists:collection_items,id',
+            'product_id' => 'required|exists:product,id',
             'size' => 'required|string',
             'color' => 'nullable|string',
             'quantity' => 'required|integer|min:1',
@@ -50,11 +50,11 @@ class CartController extends Controller
         $userId = $request->user()?->id;
         $sessionId = $validated['session_id'] ?? $request->session()->getId();
 
-        // Get the collection item to get the current price
-        $collectionItem = CollectionItem::findOrFail($validated['collection_item_id']);
+        // Get the product to get the current price
+        $product = Product::findOrFail($validated['product_id']);
 
         // Check if item already exists in cart
-        $existingItem = CartItem::where('collection_item_id', $validated['collection_item_id'])
+        $existingItem = CartItem::where('product_id', $validated['product_id'])
             ->where('size', $validated['size'])
             ->where('color', $validated['color'] ?? '')
             ->where(function ($query) use ($userId, $sessionId) {
@@ -76,15 +76,15 @@ class CartController extends Controller
             $cartItem = CartItem::create([
                 'user_id' => $userId,
                 'session_id' => $userId ? null : $sessionId,
-                'collection_item_id' => $validated['collection_item_id'],
+                'product_id' => $validated['product_id'],
                 'size' => $validated['size'],
                 'color' => $validated['color'],
                 'quantity' => $validated['quantity'],
-                'price' => $collectionItem->price,
+                'price' => $product->price,
             ]);
         }
 
-        $cartItem->load('collectionItem');
+        $cartItem->load('product');
 
         return response()->json([
             'success' => true,
@@ -121,7 +121,7 @@ class CartController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Cart item updated',
-            'data' => $cartItem->load('collectionItem'),
+            'data' => $cartItem->load('product'),
         ]);
     }
 
@@ -195,7 +195,7 @@ class CartController extends Controller
         foreach ($guestItems as $guestItem) {
             // Check if user already has this item
             $existingItem = CartItem::where('user_id', $userId)
-                ->where('collection_item_id', $guestItem->collection_item_id)
+                ->where('product_id', $guestItem->product_id)
                 ->where('size', $guestItem->size)
                 ->where('color', $guestItem->color)
                 ->first();

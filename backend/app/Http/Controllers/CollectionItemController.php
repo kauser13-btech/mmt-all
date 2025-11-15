@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CollectionItem;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class CollectionItemController extends Controller
@@ -15,14 +15,36 @@ class CollectionItemController extends Controller
         $perPage = $request->input('per_page', 20); // Default 20 items per page
         $perPage = min($perPage, 100); // Maximum 100 items per page
 
-        $items = CollectionItem::ofType($type)
-            ->active()
+        $items = Product::where('type', $type)
+            ->whereNotNull('price')
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
 
+        // Transform data to match frontend expectations
+        $transformedItems = $items->getCollection()->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'title' => $product->title,
+                'slug' => $product->slug,
+                'description' => $product->description,
+                'image' => $product->primary_img_url,
+                'images' => $product->sneaker_image_url ? [$product->primary_img_url, $product->sneaker_image_url] : [$product->primary_img_url],
+                'mockup_url' => $product->mockup_url,
+                'type' => $product->type,
+                'price' => $product->price,
+                'color_name' => $product->color_name,
+                'color_code' => $product->color_code,
+                'brand' => $product->brand,
+                'material' => $product->material,
+                'weight' => $product->weight,
+                'sku' => $product->sku,
+                'is_active' => true,
+            ];
+        });
+
         return response()->json([
             'success' => true,
-            'data' => $items->items(),
+            'data' => $transformedItems,
             'pagination' => [
                 'current_page' => $items->currentPage(),
                 'per_page' => $items->perPage(),
@@ -39,10 +61,30 @@ class CollectionItemController extends Controller
      */
     public function show($type, $slug)
     {
-        $item = CollectionItem::ofType($type)
+        $product = Product::where('type', $type)
             ->where('slug', $slug)
-            ->active()
+            ->whereNotNull('price')
             ->firstOrFail();
+
+        // Transform data to match frontend expectations
+        $item = [
+            'id' => $product->id,
+            'title' => $product->title,
+            'slug' => $product->slug,
+            'description' => $product->description,
+            'image' => $product->primary_img_url,
+            'images' => $product->sneaker_image_url ? [$product->primary_img_url, $product->sneaker_image_url] : [$product->primary_img_url],
+            'mockup_url' => $product->mockup_url,
+            'type' => $product->type,
+            'price' => $product->price,
+            'color_name' => $product->color_name,
+            'color_code' => $product->color_code,
+            'brand' => $product->brand,
+            'material' => $product->material,
+            'weight' => $product->weight,
+            'sku' => $product->sku,
+            'is_active' => true,
+        ];
 
         return response()->json([
             'success' => true,
@@ -58,19 +100,23 @@ class CollectionItemController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'image' => 'required|string',
-            'images' => 'nullable|array',
-            'type' => 'required|in:t-shirt,hoodie',
-            'price' => 'nullable|numeric|min:0',
-            'is_active' => 'boolean',
+            'primary_img_url' => 'required|string|max:500',
+            'sneaker_image_url' => 'nullable|string|max:500',
+            'type' => 'required|string|max:100',
+            'brand' => 'nullable|string|max:150',
+            'price' => 'required|numeric|min:0',
+            'color_name' => 'nullable|string|max:100',
+            'color_code' => 'nullable|string|max:20',
+            'material' => 'nullable|string|max:150',
+            'weight' => 'nullable|numeric|min:0',
         ]);
 
-        $item = CollectionItem::create($validated);
+        $product = Product::create($validated);
 
         return response()->json([
             'success' => true,
-            'message' => 'Collection item created successfully',
-            'data' => $item,
+            'message' => 'Product created successfully',
+            'data' => $product,
         ], 201);
     }
 
@@ -79,24 +125,28 @@ class CollectionItemController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $item = CollectionItem::findOrFail($id);
+        $product = Product::findOrFail($id);
 
         $validated = $request->validate([
             'title' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
-            'image' => 'sometimes|required|string',
-            'images' => 'nullable|array',
-            'type' => 'sometimes|required|in:t-shirt,hoodie',
-            'price' => 'nullable|numeric|min:0',
-            'is_active' => 'boolean',
+            'primary_img_url' => 'sometimes|required|string|max:500',
+            'sneaker_image_url' => 'nullable|string|max:500',
+            'type' => 'sometimes|required|string|max:100',
+            'brand' => 'nullable|string|max:150',
+            'price' => 'sometimes|required|numeric|min:0',
+            'color_name' => 'nullable|string|max:100',
+            'color_code' => 'nullable|string|max:20',
+            'material' => 'nullable|string|max:150',
+            'weight' => 'nullable|numeric|min:0',
         ]);
 
-        $item->update($validated);
+        $product->update($validated);
 
         return response()->json([
             'success' => true,
-            'message' => 'Collection item updated successfully',
-            'data' => $item,
+            'message' => 'Product updated successfully',
+            'data' => $product,
         ]);
     }
 
@@ -105,12 +155,12 @@ class CollectionItemController extends Controller
      */
     public function destroy($id)
     {
-        $item = CollectionItem::findOrFail($id);
-        $item->delete();
+        $product = Product::findOrFail($id);
+        $product->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Collection item deleted successfully',
+            'message' => 'Product deleted successfully',
         ]);
     }
 }

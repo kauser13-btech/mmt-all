@@ -12,7 +12,7 @@ class CartItem extends Model
     protected $fillable = [
         'user_id',
         'session_id',
-        'collection_item_id',
+        'product_id',
         'size',
         'color',
         'quantity',
@@ -33,11 +33,11 @@ class CartItem extends Model
     }
 
     /**
-     * Get the collection item associated with this cart item.
+     * Get the product associated with this cart item.
      */
-    public function collectionItem()
+    public function product()
     {
-        return $this->belongsTo(CollectionItem::class);
+        return $this->belongsTo(Product::class);
     }
 
     /**

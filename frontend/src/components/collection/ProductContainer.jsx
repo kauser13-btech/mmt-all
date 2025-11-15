@@ -32,7 +32,7 @@ export const ProductContainer = ({ productType }) => {
       const transformedProducts = data.data.map((item) => ({
         index: item.id,
         url: `/collection/${productType}/${item.slug}`,
-        image_url: item.image,
+        image_url: item.mockup_url || item.image, // Use mockup_url if available, otherwise use original image
         title: item.title,
         original_title: item.title,
         alt: item.title,
