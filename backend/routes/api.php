@@ -12,6 +12,7 @@ use App\Http\Controllers\DesignController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CollectionItemController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\Api\PaymentController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
@@ -30,6 +31,16 @@ Route::prefix('cart')->group(function () {
     Route::delete('/{id}', [CartController::class, 'destroy']);
     Route::post('/clear', [CartController::class, 'clear']);
 });
+
+// Stripe payment routes (public)
+Route::prefix('payments')->group(function () {
+    Route::post('/create-intent', [PaymentController::class, 'createPaymentIntent']);
+    Route::post('/confirm', [PaymentController::class, 'confirmPayment']);
+    Route::get('/{paymentIntentId}', [PaymentController::class, 'getPaymentDetails']);
+});
+
+// Stripe webhook (must be outside auth middleware)
+Route::post('/webhooks/stripe', [PaymentController::class, 'handleWebhook']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);

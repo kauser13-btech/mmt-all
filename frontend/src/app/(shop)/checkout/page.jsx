@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Breadcrumb from "@/components/global/Breadcrumb";
 import { toast } from "react-toastify";
+import StripePaymentForm from "@/components/stripe/StripePaymentForm";
 
 export default function CheckoutPage() {
   const { cart, cartTotal, clearCart } = useCart();
@@ -25,16 +26,10 @@ export default function CheckoutPage() {
     state: "",
     zipCode: "",
     country: "United States",
-
-    // Payment Method
-    paymentMethod: "card",
-    cardNumber: "",
-    expiryDate: "",
-    cvv: "",
-    cardName: "",
   });
 
   const [loading, setLoading] = useState(false);
+  const [formValidated, setFormValidated] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -44,36 +39,55 @@ export default function CheckoutPage() {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const validateContactAndShipping = (e) => {
     e.preventDefault();
 
     // Basic validation
-    if (!formData.email || !formData.firstName || !formData.lastName || !formData.address) {
+    if (!formData.email || !formData.firstName || !formData.lastName || !formData.address || !formData.city || !formData.state || !formData.zipCode) {
       toast.error("Please fill in all required fields");
       return;
     }
 
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    setFormValidated(true);
+    toast.success("Information validated. Please complete payment below.");
+  };
+
+  const handlePaymentSuccess = async (paymentIntent) => {
     setLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Here you would normally send the order to your backend
+      // Here you would save the order to your backend
       console.log("Order data:", {
         items: cart,
-        total: cartTotal,
+        total: total,
         customer: formData,
+        paymentIntentId: paymentIntent.id,
+        paymentStatus: paymentIntent.status,
       });
 
-      toast.success("Order placed successfully!");
+      toast.success("Payment successful! Your order has been placed.");
       clearCart();
-      router.push("/order-confirmation");
+
+      // Redirect to order confirmation with payment intent ID
+      setTimeout(() => {
+        router.push(`/order-confirmation?payment_intent=${paymentIntent.id}`);
+      }, 1500);
     } catch (error) {
-      toast.error("Failed to place order. Please try again.");
+      toast.error("Order processing failed. Please contact support.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePaymentError = (errorMessage) => {
+    toast.error(errorMessage || "Payment failed. Please try again.");
   };
 
   const shippingCost = cartTotal > 50 ? 0 : 9.99;
@@ -109,7 +123,7 @@ export default function CheckoutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Checkout Form */}
           <div className="lg:col-span-2">
-            <form onSubmit={handleSubmit} className="space-y-8">
+            <form onSubmit={validateContactAndShipping} className="space-y-8">
               {/* Contact Information */}
               <div className="bg-white p-6 rounded-lg border">
                 <h2 className="text-xl font-semibold mb-4">Contact Information</h2>
@@ -120,8 +134,9 @@ export default function CheckoutPage() {
                     placeholder="Email *"
                     value={formData.email}
                     onChange={handleInputChange}
+                    disabled={formValidated}
                     required
-                    className="px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                    className="px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary disabled:bg-gray-100"
                   />
                   <input
                     type="tel"
@@ -129,7 +144,8 @@ export default function CheckoutPage() {
                     placeholder="Phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className="px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                    disabled={formValidated}
+                    className="px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary disabled:bg-gray-100"
                   />
                 </div>
               </div>
@@ -145,8 +161,9 @@ export default function CheckoutPage() {
                       placeholder="First Name *"
                       value={formData.firstName}
                       onChange={handleInputChange}
+                      disabled={formValidated}
                       required
-                      className="px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                      className="px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary disabled:bg-gray-100"
                     />
                     <input
                       type="text"
@@ -154,8 +171,9 @@ export default function CheckoutPage() {
                       placeholder="Last Name *"
                       value={formData.lastName}
                       onChange={handleInputChange}
+                      disabled={formValidated}
                       required
-                      className="px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                      className="px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary disabled:bg-gray-100"
                     />
                   </div>
                   <input
@@ -164,8 +182,9 @@ export default function CheckoutPage() {
                     placeholder="Address *"
                     value={formData.address}
                     onChange={handleInputChange}
+                    disabled={formValidated}
                     required
-                    className="w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                    className="w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary disabled:bg-gray-100"
                   />
                   <input
                     type="text"
@@ -173,7 +192,8 @@ export default function CheckoutPage() {
                     placeholder="Apartment, suite, etc. (optional)"
                     value={formData.apartment}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                    disabled={formValidated}
+                    className="w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary disabled:bg-gray-100"
                   />
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <input
@@ -182,8 +202,9 @@ export default function CheckoutPage() {
                       placeholder="City *"
                       value={formData.city}
                       onChange={handleInputChange}
+                      disabled={formValidated}
                       required
-                      className="px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                      className="px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary disabled:bg-gray-100"
                     />
                     <input
                       type="text"
@@ -191,8 +212,9 @@ export default function CheckoutPage() {
                       placeholder="State *"
                       value={formData.state}
                       onChange={handleInputChange}
+                      disabled={formValidated}
                       required
-                      className="px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                      className="px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary disabled:bg-gray-100"
                     />
                     <input
                       type="text"
@@ -200,70 +222,46 @@ export default function CheckoutPage() {
                       placeholder="ZIP Code *"
                       value={formData.zipCode}
                       onChange={handleInputChange}
+                      disabled={formValidated}
                       required
-                      className="px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                      className="px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary disabled:bg-gray-100"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Payment Method */}
-              <div className="bg-white p-6 rounded-lg border">
-                <h2 className="text-xl font-semibold mb-4">Payment Method</h2>
-                <div className="space-y-4">
-                  <input
-                    type="text"
-                    name="cardName"
-                    placeholder="Cardholder Name *"
-                    value={formData.cardName}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary"
-                  />
-                  <input
-                    type="text"
-                    name="cardNumber"
-                    placeholder="Card Number *"
-                    value={formData.cardNumber}
-                    onChange={handleInputChange}
-                    required
-                    maxLength="16"
-                    className="w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary"
-                  />
-                  <div className="grid grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      name="expiryDate"
-                      placeholder="MM/YY *"
-                      value={formData.expiryDate}
-                      onChange={handleInputChange}
-                      required
-                      maxLength="5"
-                      className="px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary"
-                    />
-                    <input
-                      type="text"
-                      name="cvv"
-                      placeholder="CVV *"
-                      value={formData.cvv}
-                      onChange={handleInputChange}
-                      required
-                      maxLength="4"
-                      className="px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-primary"
-                    />
-                  </div>
-                </div>
-              </div>
+              {/* Validate Button */}
+              {!formValidated && (
+                <button
+                  type="submit"
+                  className="w-full py-4 bg-orange-primary text-white font-semibold rounded-md hover:bg-orange-600 transition-colors"
+                >
+                  Continue to Payment
+                </button>
+              )}
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-4 bg-orange-primary text-white font-semibold rounded-md hover:bg-orange-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-              >
-                {loading ? "Processing..." : `Place Order - $${total.toFixed(2)}`}
-              </button>
+              {formValidated && (
+                <button
+                  type="button"
+                  onClick={() => setFormValidated(false)}
+                  className="w-full py-3 bg-gray-200 text-gray-700 font-semibold rounded-md hover:bg-gray-300 transition-colors"
+                >
+                  Edit Information
+                </button>
+              )}
             </form>
+
+            {/* Stripe Payment Form */}
+            {formValidated && (
+              <div className="mt-8">
+                <StripePaymentForm
+                  amount={total}
+                  formData={formData}
+                  onSuccess={handlePaymentSuccess}
+                  onError={handlePaymentError}
+                />
+              </div>
+            )}
           </div>
 
           {/* Order Summary */}
