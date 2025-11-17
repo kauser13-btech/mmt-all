@@ -6,23 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
-        Schema::table('assets', function (Blueprint $table) {
-            $table->json('color_palette')->nullable();
-        });
-    }
+    // /**
+    //  * Run the migrations.
+    //  */
+    // public function up(): void
+    // {
+    //     Schema::table('assets', function (Blueprint $table) {
+    //         $table->json('color_palette')->nullable();
+    //     });
+    // }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('assets', function (Blueprint $table) {
-            $table->dropColumn('color_palette');
-        });
-    }
+    // /**
+    //  * Reverse the migrations.
+    //  */
+    // public function down(): void
+    // {
+    //     Schema::table('assets', function (Blueprint $table) {
+    //         $table->dropColumn('color_palette');
+    //     });
+    // }
 };

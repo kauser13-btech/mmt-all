@@ -9,27 +9,27 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::create('collection_items', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->text('description')->nullable();
-            $table->string('image'); // main image
-            $table->json('images')->nullable(); // gallery images array
-            $table->enum('type', ['t-shirt', 'hoodie']); // product type
-            $table->string('slug')->unique();
-            $table->decimal('price', 10, 2)->nullable();
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
-        });
-    }
+    // public function up(): void
+    // {
+    //     Schema::create('collection_items', function (Blueprint $table) {
+    //         $table->id();
+    //         $table->string('title');
+    //         $table->text('description')->nullable();
+    //         $table->string('image'); // main image
+    //         $table->json('images')->nullable(); // gallery images array
+    //         $table->enum('type', ['t-shirt', 'hoodie']); // product type
+    //         $table->string('slug')->unique();
+    //         $table->decimal('price', 10, 2)->nullable();
+    //         $table->boolean('is_active')->default(true);
+    //         $table->timestamps();
+    //     });
+    // }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('collection_items');
-    }
+    // /**
+    //  * Reverse the migrations.
+    //  */
+    // public function down(): void
+    // {
+    //     Schema::dropIfExists('collection_items');
+    // }
 };
