@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('sneakers', function (Blueprint $table) {
-            $table->renameColumn('image', 'asset_id');
-        });
+        // Check if the column exists before renaming
+        if (Schema::hasColumn('sneakers', 'image')) {
+            Schema::table('sneakers', function (Blueprint $table) {
+                $table->renameColumn('image', 'asset_id');
+            });
+        }
     }
 
     /**
@@ -21,8 +24,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('sneakers', function (Blueprint $table) {
-            $table->renameColumn('asset_id', 'image');
-        });
+        // Check if the column exists before renaming back
+        if (Schema::hasColumn('sneakers', 'asset_id')) {
+            Schema::table('sneakers', function (Blueprint $table) {
+                $table->renameColumn('asset_id', 'image');
+            });
+        }
     }
 };
