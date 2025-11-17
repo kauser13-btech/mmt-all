@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
-            $table->foreignId('product_id')->nullable()->constrained()->onDelete('set null');
+
+            // Product reference - nullable, no foreign key constraint since products table may not exist
+            $table->unsignedBigInteger('product_id')->nullable();
 
             // Product details (snapshot at time of order)
             $table->string('product_name');
@@ -41,6 +43,13 @@ return new class extends Migration
             $table->index('order_id');
             $table->index('product_id');
         });
+
+        // Add foreign key constraint only if products table exists
+        if (Schema::hasTable('products')) {
+            Schema::table('order_items', function (Blueprint $table) {
+                $table->foreign('product_id')->references('id')->on('products')->onDelete('set null');
+            });
+        }
     }
 
     /**
