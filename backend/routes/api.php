@@ -13,6 +13,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CollectionItemController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\OrderController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
@@ -42,12 +43,22 @@ Route::prefix('payments')->group(function () {
 // Stripe webhook (must be outside auth middleware)
 Route::post('/webhooks/stripe', [PaymentController::class, 'handleWebhook']);
 
+// Order tracking (public - for guests)
+Route::post('/orders/track', [OrderController::class, 'track']);
+Route::get('/orders/{orderNumber}', [OrderController::class, 'show']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
 
     // Merge guest cart with user cart after login
     Route::post('/cart/merge', [CartController::class, 'merge']);
+
+    // Orders (authenticated users)
+    Route::prefix('orders')->group(function () {
+        Route::get('/', [OrderController::class, 'index']);
+        Route::get('/statistics', [OrderController::class, 'statistics']);
+    });
 
     Route::prefix('dashboard')->group(function () {
         Route::get('/stats', [DashboardController::class, 'stats']);

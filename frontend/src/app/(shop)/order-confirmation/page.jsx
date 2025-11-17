@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Breadcrumb from "@/components/global/Breadcrumb";
 import { CheckCircle } from "lucide-react";
@@ -8,7 +8,33 @@ import { CheckCircle } from "lucide-react";
 function OrderConfirmationContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const paymentIntentId = searchParams.get("payment_intent");
+  const orderNumber = searchParams.get("order_number");
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (orderNumber) {
+      fetchOrderDetails();
+    } else {
+      setLoading(false);
+    }
+  }, [orderNumber]);
+
+  const fetchOrderDetails = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://nginx/api/'}orders/${orderNumber}`
+      );
+      const data = await response.json();
+      if (data.success) {
+        setOrderDetails(data.order);
+      }
+    } catch (error) {
+      console.error('Failed to fetch order details:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <main>
@@ -28,12 +54,35 @@ function OrderConfirmationContent() {
             Thank you for your purchase. Your order has been successfully placed and is being processed.
           </p>
 
-          {paymentIntentId && (
+          {loading ? (
             <div className="bg-gray-50 p-6 rounded-lg mb-8">
-              <p className="text-sm text-gray-600 mb-2">Payment Reference</p>
-              <p className="font-mono text-sm break-all">{paymentIntentId}</p>
+              <p className="text-gray-600">Loading order details...</p>
             </div>
-          )}
+          ) : orderNumber && orderDetails ? (
+            <div className="bg-gray-50 p-6 rounded-lg mb-8 text-left">
+              <div className="mb-4">
+                <p className="text-sm text-gray-600 mb-1">Order Number</p>
+                <p className="font-mono text-lg font-semibold">{orderDetails.order_number}</p>
+              </div>
+              <div className="mb-4">
+                <p className="text-sm text-gray-600 mb-1">Total Amount</p>
+                <p className="text-2xl font-bold text-orange-primary">${orderDetails.total}</p>
+              </div>
+              <div className="mb-4">
+                <p className="text-sm text-gray-600 mb-1">Status</p>
+                <p className="capitalize font-semibold text-green-600">{orderDetails.status}</p>
+              </div>
+              <div className="mb-4">
+                <p className="text-sm text-gray-600 mb-1">Email Confirmation Sent To</p>
+                <p className="text-sm">{orderDetails.customer_email}</p>
+              </div>
+            </div>
+          ) : orderNumber ? (
+            <div className="bg-gray-50 p-6 rounded-lg mb-8">
+              <p className="text-sm text-gray-600 mb-2">Order Number</p>
+              <p className="font-mono text-sm break-all">{orderNumber}</p>
+            </div>
+          ) : null}
 
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
             <h2 className="font-semibold text-lg mb-2">What's Next?</h2>

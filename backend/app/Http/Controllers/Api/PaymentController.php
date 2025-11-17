@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
 use Stripe\Exception\ApiErrorException;
+use App\Models\Order;
+use App\Models\OrderItem;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
@@ -60,19 +64,73 @@ class PaymentController extends Controller
         $request->validate([
             'payment_intent_id' => 'required|string',
             'order_data' => 'required|array',
+            'order_data.customer' => 'required|array',
+            'order_data.items' => 'required|array',
+            'order_data.totals' => 'required|array',
         ]);
 
         try {
             $paymentIntent = PaymentIntent::retrieve($request->payment_intent_id);
 
             if ($paymentIntent->status === 'succeeded') {
-                // Save order to database here
-                // Example: Order::create($request->order_data);
+                // Save order to database
+                $order = DB::transaction(function () use ($request, $paymentIntent) {
+                    $orderData = $request->order_data;
+                    $customer = $orderData['customer'];
+                    $totals = $orderData['totals'];
+
+                    // Create the order
+                    $order = Order::create([
+                        'order_number' => Order::generateOrderNumber(),
+                        'user_id' => auth()->id(), // null if guest
+                        'stripe_payment_intent_id' => $paymentIntent->id,
+                        'payment_status' => 'succeeded',
+                        'amount' => $paymentIntent->amount / 100,
+                        'currency' => $paymentIntent->currency,
+                        'customer_email' => $customer['email'],
+                        'customer_phone' => $customer['phone'] ?? null,
+                        'customer_first_name' => $customer['firstName'],
+                        'customer_last_name' => $customer['lastName'],
+                        'shipping_address' => $customer['address'],
+                        'shipping_apartment' => $customer['apartment'] ?? null,
+                        'shipping_city' => $customer['city'],
+                        'shipping_state' => $customer['state'],
+                        'shipping_zip_code' => $customer['zipCode'],
+                        'shipping_country' => $customer['country'] ?? 'United States',
+                        'subtotal' => $totals['subtotal'],
+                        'shipping_cost' => $totals['shipping'],
+                        'tax' => $totals['tax'],
+                        'total' => $totals['total'],
+                        'status' => 'processing',
+                    ]);
+
+                    // Create order items
+                    foreach ($orderData['items'] as $item) {
+                        OrderItem::create([
+                            'order_id' => $order->id,
+                            'product_id' => $item['product_id'] ?? null,
+                            'product_name' => $item['title'] ?? $item['name'],
+                            'product_description' => $item['description'] ?? null,
+                            'product_image' => $item['image'] ?? null,
+                            'product_sku' => $item['sku'] ?? null,
+                            'size' => $item['size'] ?? null,
+                            'color' => $item['color'] ?? null,
+                            'unit_price' => $item['price'],
+                            'quantity' => $item['quantity'],
+                            'total_price' => $item['price'] * $item['quantity'],
+                            'custom_design_url' => $item['custom_design_url'] ?? null,
+                            'customization_data' => $item['customization'] ?? null,
+                        ]);
+                    }
+
+                    return $order->load('items');
+                });
 
                 return response()->json([
                     'success' => true,
                     'message' => 'Payment confirmed and order saved',
-                    'payment_intent' => $paymentIntent,
+                    'order' => $order,
+                    'order_number' => $order->order_number,
                 ]);
             }
 
@@ -81,9 +139,16 @@ class PaymentController extends Controller
                 'message' => 'Payment not completed',
             ], 400);
         } catch (ApiErrorException $e) {
+            Log::error('Stripe API error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'error' => $e->getMessage(),
+            ], 500);
+        } catch (\Exception $e) {
+            Log::error('Order creation error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to create order: ' . $e->getMessage(),
             ], 500);
         }
     }

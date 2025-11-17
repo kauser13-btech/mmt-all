@@ -63,24 +63,55 @@ export default function CheckoutPage() {
     setLoading(true);
 
     try {
-      // Here you would save the order to your backend
-      console.log("Order data:", {
-        items: cart,
-        total: total,
-        customer: formData,
-        paymentIntentId: paymentIntent.id,
-        paymentStatus: paymentIntent.status,
+      // Save order to backend
+      const orderData = {
+        payment_intent_id: paymentIntent.id,
+        order_data: {
+          customer: formData,
+          items: cart.map(item => ({
+            product_id: item.id,
+            title: item.title,
+            description: item.description,
+            image: item.image,
+            sku: item.sku,
+            size: item.size,
+            color: item.color,
+            price: item.price,
+            quantity: item.quantity,
+          })),
+          totals: {
+            subtotal: cartTotal,
+            shipping: shippingCost,
+            tax: tax,
+            total: total,
+          },
+        },
+      };
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://nginx/api/'}payments/confirm`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
       });
 
-      toast.success("Payment successful! Your order has been placed.");
-      clearCart();
+      const result = await response.json();
 
-      // Redirect to order confirmation with payment intent ID
-      setTimeout(() => {
-        router.push(`/order-confirmation?payment_intent=${paymentIntent.id}`);
-      }, 1500);
+      if (result.success) {
+        toast.success("Payment successful! Your order has been placed.");
+        clearCart();
+
+        // Redirect to order confirmation with order number
+        setTimeout(() => {
+          router.push(`/order-confirmation?order_number=${result.order_number}`);
+        }, 1500);
+      } else {
+        throw new Error(result.error || 'Failed to save order');
+      }
     } catch (error) {
-      toast.error("Order processing failed. Please contact support.");
+      console.error('Order save error:', error);
+      toast.error("Order processing failed. Please contact support with your payment ID: " + paymentIntent.id);
     } finally {
       setLoading(false);
     }
